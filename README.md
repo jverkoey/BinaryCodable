@@ -4,6 +4,8 @@ Binary Codable provides Swift Codable-like interfaces for converting types into 
 
 Binary Codable is optimized for reading and writing blocks of binary data as a stream of bytes. This makes Binary Codable useful for network protocols, binary file formats, and other forms of tightly-packed binary information.
 
+This is not an official Google product.
+
 ## Features
 
 - [x] Encode from Swift types to `Data`.
