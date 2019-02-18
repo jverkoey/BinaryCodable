@@ -8,14 +8,14 @@ branches:
 
 matrix:
   include:
-    - name: "OS X Xcode 10.1"
+    - name: "OS X / Xcode 10.1"
       os: osx
       osx_image: xcode10.1
       language: swift
       script:
         - swift test
 
-    - name: "Linux Swift 4.2.2"
+    - name: "Ubuntu 16.04 / Swift 4.2.2"
       os: linux
       dist: xenial
       language: c
@@ -27,7 +27,7 @@ matrix:
       script:
         - swift test
 
-    - name: "Linux Swift latest"
+    - name: "Ubuntu 16.04 / Swift latest"
       os: linux
       dist: xenial
       language: c
