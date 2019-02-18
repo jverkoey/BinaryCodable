@@ -1,0 +1,40 @@
+sudo:
+  - false
+
+branches:
+  only:
+    - develop
+    - stable
+
+matrix:
+  include:
+    - name: "OS X Xcode 10.1"
+      os: osx
+      osx_image: xcode10.1
+      language: swift
+      script:
+        - swift test
+
+    - name: "Linux Swift 4.2.2"
+      os: linux
+      dist: xenial
+      language: c
+      before_script:
+        - wget https://swift.org/builds/swift-4.2.2-release/ubuntu1604/swift-4.2.2-RELEASE/swift-4.2.2-RELEASE-ubuntu16.04.tar.gz
+        - tar xzf swift-4.2.2-RELEASE-ubuntu16.04.tar.gz
+        - export PATH=$(pwd)/swift-4.2.2-RELEASE-ubuntu16.04/usr/bin:"${PATH}"
+        - swift --version
+      script:
+        - swift test
+
+    - name: "Linux Swift latest"
+      os: linux
+      dist: xenial
+      language: c
+      before_script:
+        - wget "https://swift.org/builds/development/ubuntu1604/swift-DEVELOPMENT-SNAPSHOT-2019-02-14-a/swift-DEVELOPMENT-SNAPSHOT-2019-02-14-a-ubuntu16.04.tar.gz"
+        - tar xzf swift-DEVELOPMENT-SNAPSHOT-2019-02-14-a-ubuntu16.04.tar.gz
+        - export PATH=$(pwd)/swift-DEVELOPMENT-SNAPSHOT-2019-02-14-a-ubuntu16.04/usr/bin:"${PATH}"
+        - swift --version
+      script:
+        - swift test
