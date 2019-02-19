@@ -24,6 +24,13 @@ extension BufferedDataTests {
     ]
 }
 
+extension GIFDecoderTests {
+    static let __allTests = [
+        ("testDecoding", testDecoding),
+        ("testEncoding", testEncoding),
+    ]
+}
+
 extension Tests {
     static let __allTests = [
         ("testIntDependsOnThePlatform", testIntDependsOnThePlatform),
@@ -40,6 +47,7 @@ public func __allTests() -> [XCTestCaseEntry] {
         testCase(BinaryDataDecoderTests.__allTests),
         testCase(BinaryDataEncoderTests.__allTests),
         testCase(BufferedDataTests.__allTests),
+        testCase(GIFDecoderTests.__allTests),
         testCase(Tests.__allTests),
     ]
 }
