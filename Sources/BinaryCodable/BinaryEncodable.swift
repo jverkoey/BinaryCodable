@@ -1,4 +1,4 @@
-// Copyright 2019-present the MySqlConnector authors. All Rights Reserved.
+// Copyright 2019-present the BinaryCodable authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,11 +34,11 @@ public protocol BinaryEncodable {
  */
 public protocol BinaryEncoder {
   /**
-   Returns an encoding container appropriate for holding multiple values.
+   Returns an encoding container appropriate for holding multiple sequential values.
 
    - returns: A new empty container.
    */
-  func container() -> BinaryEncodingContainer
+  func sequentialContainer() -> SequentialBinaryEncodingContainer
 }
 
 /**
@@ -78,7 +78,7 @@ public enum BinaryEncodingError: Error {
  A type that provides a view into an encoder's storage and is used to hold the encoded properties of a encodable type
  sequentially.
  */
-public protocol BinaryEncodingContainer {
+public protocol SequentialBinaryEncodingContainer {
 
   /**
    Encodes a String value using the given encoding and with a terminator at the end.
@@ -116,7 +116,14 @@ public protocol BinaryEncodingContainer {
 
 extension RawRepresentable where RawValue: FixedWidthInteger, Self: BinaryEncodable {
   public func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.container()
+    var container = encoder.sequentialContainer()
     try container.encode(self.rawValue)
+  }
+}
+
+extension RawRepresentable where RawValue == String, Self: BinaryEncodable {
+  public func encode(to encoder: BinaryEncoder) throws {
+    var container = encoder.sequentialContainer()
+    try container.encode(self.rawValue, encoding: .utf8, terminator: nil)
   }
 }
