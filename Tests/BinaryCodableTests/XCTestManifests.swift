@@ -1,5 +1,21 @@
 import XCTest
 
+extension BinaryDataDecoderTests {
+    static let __allTests = [
+        ("testEmpty", testEmpty),
+        ("testMultipleByte", testMultipleByte),
+        ("testOneByte", testOneByte),
+    ]
+}
+
+extension BinaryDataEncoderTests {
+    static let __allTests = [
+        ("testEmptyLength", testEmptyLength),
+        ("testMultipleByte", testMultipleByte),
+        ("testOneByte", testOneByte),
+    ]
+}
+
 extension BufferedDataTests {
     static let __allTests = [
         ("testInitiallyPullsFromStart", testInitiallyPullsFromStart),
@@ -21,6 +37,8 @@ extension Tests {
 #if !os(macOS)
 public func __allTests() -> [XCTestCaseEntry] {
     return [
+        testCase(BinaryDataDecoderTests.__allTests),
+        testCase(BinaryDataEncoderTests.__allTests),
         testCase(BufferedDataTests.__allTests),
         testCase(Tests.__allTests),
     ]

@@ -1,4 +1,4 @@
-// Copyright 2019-present the MySqlConnector authors. All Rights Reserved.
+// Copyright 2019-present the BinaryCodable authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 import Foundation
 
 /**
- An object that decodes instances of a type from binary data.
+ An object that decodes instances of a type from binary data as a sequential series of bytes.
  */
 public struct BinaryDataDecoder {
   public init() {}
@@ -55,7 +55,7 @@ public struct BinaryDataDecoder {
 private struct _BinaryDataDecoder: BinaryDecoder {
   var bufferedData: BufferedData
   let userInfo: [BinaryCodingUserInfoKey: Any]
-  let container: BinaryDecodingContainer?
+  let container: SequentialBinaryDecodingContainer?
 
   init(bufferedData: BufferedData, userInfo: [BinaryCodingUserInfoKey: Any]) {
     self.bufferedData = bufferedData
@@ -63,13 +63,13 @@ private struct _BinaryDataDecoder: BinaryDecoder {
     self.container = nil
   }
 
-  init(bufferedData: BufferedData, userInfo: [BinaryCodingUserInfoKey: Any], container: BinaryDecodingContainer) {
+  init(bufferedData: BufferedData, userInfo: [BinaryCodingUserInfoKey: Any], container: SequentialBinaryDecodingContainer) {
     self.bufferedData = bufferedData
     self.userInfo = userInfo
     self.container = container
   }
 
-  func container(maxLength: Int?) -> BinaryDecodingContainer {
+  func sequentialContainer(maxLength: Int?) -> SequentialBinaryDecodingContainer {
     if let maxLength = maxLength, let container = container as? BinaryDataDecodingContainer, let remainingLength = container.remainingLength {
       return BinaryDataDecodingContainer(bufferedData: bufferedData,
                                          maxLength: min(maxLength, remainingLength),
@@ -85,7 +85,7 @@ private struct _BinaryDataDecoder: BinaryDecoder {
 }
 
 // This needs to be a class instead of a struct because we hold a mutating reference in decode<T>.
-private class BinaryDataDecodingContainer: BinaryDecodingContainer {
+private class BinaryDataDecodingContainer: SequentialBinaryDecodingContainer {
   var bufferedData: BufferedData
   var remainingLength: Int?
   let userInfo: [BinaryCodingUserInfoKey: Any]
@@ -106,24 +106,18 @@ private class BinaryDataDecodingContainer: BinaryDecodingContainer {
     return try decodeFixedWidthInteger(type)
   }
 
-  func decodeString(encoding: String.Encoding, terminator: UInt8) throws -> String {
-    let result = try bufferedData.read(until: terminator)
-    guard result.didFindDelimiter else {
-      throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
-        "Unable to find delimiter for string."))
+  func decodeString(encoding: String.Encoding, terminator: UInt8?) throws -> String {
+    let data: Data
+    if let terminator = terminator {
+      let result = try bufferedData.read(until: terminator)
+      guard result.didFindDelimiter else {
+        throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
+          "Unable to find delimiter for string."))
+      }
+      data = result.data
+    } else {
+      data = try bufferedData.read(maxBytes: Int.max)
     }
-    if let remainingLength = remainingLength {
-      self.remainingLength = remainingLength - (result.data.count + 1)
-    }
-    guard let string = String(data: result.data, encoding: encoding) else {
-      throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
-        "Unable to create string from data with \(encoding) encoding."))
-    }
-    return string
-  }
-
-  func decodeString(encoding: String.Encoding) throws -> String {
-    let data = try bufferedData.read(maxBytes: Int.max)
     if let remainingLength = remainingLength {
       self.remainingLength = remainingLength - (data.count + 1)
     }
@@ -135,13 +129,7 @@ private class BinaryDataDecodingContainer: BinaryDecodingContainer {
   }
 
   func decode<T>(_ type: T.Type) throws -> T where T: BinaryDecodable {
-    let containedBuffer = BufferedData(reader: AnyBufferedDataSource(read: { recommendedAmount -> Data? in
-      let data = try self.pullData(length: recommendedAmount)
-      return data.count > 0 ? data : nil
-    }, isAtEnd: {
-      return self.isAtEnd
-    }))
-    return try T.init(from: _BinaryDataDecoder(bufferedData: containedBuffer, userInfo: userInfo, container: self))
+    return try T.init(from: _BinaryDataDecoder(bufferedData: containedBuffer(), userInfo: userInfo, container: self))
   }
 
   func decode(length: Int) throws -> Data {
@@ -153,7 +141,7 @@ private class BinaryDataDecodingContainer: BinaryDecodingContainer {
     return data
   }
 
-  func nestedContainer(maxLength: Int?) -> BinaryDecodingContainer {
+  func nestedContainer(maxLength: Int?) -> SequentialBinaryDecodingContainer {
     let length: Int?
     if let remainingLength = remainingLength, let maxLength = maxLength {
       length = min(remainingLength, maxLength)
@@ -162,7 +150,7 @@ private class BinaryDataDecodingContainer: BinaryDecodingContainer {
     } else {
       length = maxLength
     }
-    return BinaryDataDecodingContainer(bufferedData: bufferedData, maxLength: length, userInfo: userInfo)
+    return BinaryDataDecodingContainer(bufferedData: containedBuffer(), maxLength: length, userInfo: userInfo)
   }
 
   func pullData(length: Int) throws -> Data {
@@ -205,5 +193,14 @@ private class BinaryDataDecodingContainer: BinaryDecodingContainer {
       return ptr.pointee
     }
     return value
+  }
+
+  private func containedBuffer() -> BufferedData {
+    return BufferedData(reader: AnyBufferedDataSource(read: { recommendedAmount -> Data? in
+      let data = try self.pullData(length: recommendedAmount)
+      return data.count > 0 ? data : nil
+    }, isAtEnd: {
+      return self.isAtEnd
+    }))
   }
 }

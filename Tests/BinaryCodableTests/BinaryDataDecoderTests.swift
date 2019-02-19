@@ -1,4 +1,4 @@
-// Copyright 2019-present the MySqlConnector authors. All Rights Reserved.
+// Copyright 2019-present the BinaryCodable authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import XCTest
 private struct Packet: BinaryDecodable {
   let data: Data
   init(from decoder: BinaryDecoder) throws {
-    var container = decoder.container(maxLength: nil)
+    var container = decoder.sequentialContainer(maxLength: nil)
     let payloadLength = try container.decode(UInt32.self)
     self.data = try container.decode(length: Int(payloadLength))
   }

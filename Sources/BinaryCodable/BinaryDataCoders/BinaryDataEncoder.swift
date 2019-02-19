@@ -1,4 +1,4 @@
-// Copyright 2019-present the MySqlConnector authors. All Rights Reserved.
+// Copyright 2019-present the BinaryCodable authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 import Foundation
 
 /**
- An object that encodes instances of a type to binary data.
+ An object that encodes instances of a type to binary data as a sequential series of bytes.
  */
 public struct BinaryDataEncoder {
   public init() {}
@@ -40,12 +40,12 @@ private final class BinaryDataEncoderStorage {
 private struct _BinaryDataEncoder: BinaryEncoder {
   var storage = BinaryDataEncoderStorage()
 
-  func container() -> BinaryEncodingContainer {
+  func sequentialContainer() -> SequentialBinaryEncodingContainer {
     return BinaryDataEncodingContainer(encoder: self)
   }
 }
 
-private struct BinaryDataEncodingContainer: BinaryEncodingContainer {
+private struct BinaryDataEncodingContainer: SequentialBinaryEncodingContainer {
   let encoder: _BinaryDataEncoder
   init(encoder: _BinaryDataEncoder) {
     self.encoder = encoder

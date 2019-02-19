@@ -1,4 +1,4 @@
-// Copyright 2019-present the MySqlConnector authors. All Rights Reserved.
+// Copyright 2019-present the BinaryCodable authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ private struct Packet: BinaryEncodable {
   let data: Data
 
   func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.container()
+    var container = encoder.sequentialContainer()
     try container.encode(UInt32(data.count))
     try container.encode(sequence: data)
   }

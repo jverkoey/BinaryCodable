@@ -1,4 +1,4 @@
-// Copyright 2019-present the MySqlConnector authors. All Rights Reserved.
+// Copyright 2019-present the BinaryCodable authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public protocol BinaryDecoder {
    this container is able to read an infinite number of bytes.
    - returns: A container view into this decoder.
    */
-  func container(maxLength: Int?) -> BinaryDecodingContainer
+  func sequentialContainer(maxLength: Int?) -> SequentialBinaryDecodingContainer
 }
 
 /**
@@ -86,7 +86,7 @@ public enum BinaryDecodingError: Error {
  A type that provides a view into a decoder's storage and is used to hold the encoded properties of a decodable type
  sequentially.
  */
-public protocol BinaryDecodingContainer {
+public protocol SequentialBinaryDecodingContainer {
 
   /**
    A Boolean value indicating whether there are no more elements left to be decoded in the container.
@@ -97,18 +97,11 @@ public protocol BinaryDecodingContainer {
    Decodes a String value using the given encoding up until a given delimiter is encountered.
 
    - parameter encoding: The string encoding to use when creating the string representation from the binary data.
-   - parameter terminator: Typically 0. The string will stop being decoded once the terminator is encountered.
+   - parameter terminator: Typically 0. If provided, the string will stop being decoded once the terminator is
+   encountered. Otherwise, the string will be decoded until no additional data is available.
    - returns: The decoded String value.
    */
-  mutating func decodeString(encoding: String.Encoding, terminator: UInt8) throws -> String
-
-  /**
-   Decodes a String value using the given encoding up until the end of the available data.
-
-   - parameter encoding: The string encoding to use when creating the string representation from the binary data.
-   - returns: The decoded String value.
-   */
-  mutating func decodeString(encoding: String.Encoding) throws -> String
+  mutating func decodeString(encoding: String.Encoding, terminator: UInt8?) throws -> String
 
   /**
    Decodes a value of the given type.
@@ -149,16 +142,30 @@ public protocol BinaryDecodingContainer {
    returned container is able to read all bytes that are readable by this container.
    - returns: A decoding container view into `self`.
    */
-  mutating func nestedContainer(maxLength: Int?) -> BinaryDecodingContainer
+  mutating func nestedContainer(maxLength: Int?) -> SequentialBinaryDecodingContainer
 }
 
 // MARK: RawRepresentable extensions
 
+// Primarily for enums with some FixedWidthInteger raw value
 extension RawRepresentable where RawValue: FixedWidthInteger, Self: BinaryDecodable {
   public init(from decoder: BinaryDecoder) throws {
     let byteWidth = RawValue.bitWidth / 8
-    var container = decoder.container(maxLength: byteWidth)
+    var container = decoder.sequentialContainer(maxLength: byteWidth)
     let decoded = try container.decode(RawValue.self)
+    guard let value = Self(rawValue: decoded) else {
+      throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
+        "Cannot initialize \(Self.self) from invalid \(RawValue.self) value \(decoded)"))
+    }
+    self = value
+  }
+}
+
+// Primarily for enums with a String raw value
+extension RawRepresentable where RawValue == String, Self: BinaryDecodable {
+  public init(from decoder: BinaryDecoder) throws {
+    var container = decoder.sequentialContainer(maxLength: nil)
+    let decoded = try container.decodeString(encoding: .utf8, terminator: nil)
     guard let value = Self(rawValue: decoded) else {
       throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
         "Cannot initialize \(Self.self) from invalid \(RawValue.self) value \(decoded)"))
