@@ -34,7 +34,7 @@ This is not an official Google product.
 
 ## Known usage in the wild
 
-- [MySqlConnector](https://github.com/jverkoey/MySqlConnector): Translates between Swift types and MySql client/server protocol.
+- [MySqlConnector](https://github.com/jverkoey/MySqlConnector): A pure Swift implementation of the MySql client/server protocol.
 
 ## Requirements
 
