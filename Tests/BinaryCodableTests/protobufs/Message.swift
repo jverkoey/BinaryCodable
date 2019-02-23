@@ -15,28 +15,19 @@
 import BinaryCodable
 import Foundation
 
-/**
- This is a hypothetical generated protobuf message class built with BinaryCodable.
- */
-struct Message: BinaryDecodable {
+struct Message: ProtoDecodable {
   var value1: Int32 = 0
-  var value2: Int32 = 0
+  var value2: UInt32 = 0
   var value3: Int32 = 0
-  init(from decoder: BinaryDecoder) throws {
-    var container = decoder.container(maxLength: nil)
 
-    while !container.isAtEnd {
-      let message = try container.decode(ProtoMessage.self)
-      switch (message.fieldNumber, message.value) {
-      case (1, .varint(let value)):
-        self.value1 = Int32(truncatingIfNeeded: value)
-      case (2, .varint(let value)):
-        self.value2 = Int32(truncatingIfNeeded: value)
-      case (3, .varint(let value)):
-        self.value3 = Int32(truncatingIfNeeded: value)
-      default:
-        continue
-      }
+  static func fieldDescriptor(for key: CodingKey) -> Field? {
+    guard let codingKey = key as? CodingKeys else {
+      return nil
+    }
+    switch codingKey {
+    case .value1: return Field(number: 1, type: .int32)
+    case .value2: return Field(number: 2, type: .uint32)
+    case .value3: return Field(number: 3, type: .sint32)
     }
   }
 }

@@ -401,26 +401,26 @@ class ProtobufTests: XCTestCase {
 
   func testGeneratedMessageDecoding() throws {
     // Given
-    let data = try compileProto(definition: """
-      message int_value {
-        int32 first_value = 1;
-        int32 second_value = 2;
-        int32 third_value = 3;
-      }
-      """, message: "int_value", content: """
-      first_value: 1
-      second_value: 128
-      third_value: 268435456
-      """)
-    let decoder = BinaryDataDecoder()
-
-    // When
     do {
+      let data = try compileProto(definition: """
+        message int_value {
+          int32 first_value = 1;
+          uint32 second_value = 2;
+          sint32 third_value = 3;
+        }
+        """, message: "int_value", content: """
+        first_value: 1
+        second_value: \(UInt32.max)
+        third_value: 268435456
+        """)
+      let decoder = ProtoDecoder()
+
+      // When
       let message = try decoder.decode(Message.self, from: data)
 
       // Then
       XCTAssertEqual(message.value1, 1)
-      XCTAssertEqual(message.value2, 128)
+      XCTAssertEqual(message.value2, UInt32.max)
       XCTAssertEqual(message.value3, 268435456)
     } catch let error {
       XCTFail(String(describing: error))
