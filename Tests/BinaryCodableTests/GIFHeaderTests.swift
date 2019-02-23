@@ -67,7 +67,7 @@ struct GIFHeader: BinaryCodable {
   }
 
   init(from decoder: BinaryDecoder) throws {
-    var container = decoder.sequentialContainer(maxLength: 13)
+    var container = decoder.container(maxLength: 13)
 
     let signature = try container.decode(length: 3)
     if signature != Data("GIF".utf8) {
@@ -92,7 +92,7 @@ struct GIFHeader: BinaryCodable {
   }
 
   func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
 
     try container.encode("GIF", encoding: .ascii, terminator: nil)
     try container.encode(version)

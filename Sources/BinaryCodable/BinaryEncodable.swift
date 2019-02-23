@@ -38,7 +38,7 @@ public protocol BinaryEncoder {
 
    - returns: A new empty container.
    */
-  func sequentialContainer() -> SequentialBinaryEncodingContainer
+  func container() -> BinaryEncodingContainer
 }
 
 /**
@@ -78,7 +78,7 @@ public enum BinaryEncodingError: Error {
  A type that provides a view into an encoder's storage and is used to hold the encoded properties of a encodable type
  sequentially.
  */
-public protocol SequentialBinaryEncodingContainer {
+public protocol BinaryEncodingContainer {
 
   /**
    Encodes a String value using the given encoding and with a terminator at the end.
@@ -116,14 +116,14 @@ public protocol SequentialBinaryEncodingContainer {
 
 extension RawRepresentable where RawValue: FixedWidthInteger, Self: BinaryEncodable {
   public func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
     try container.encode(self.rawValue)
   }
 }
 
 extension RawRepresentable where RawValue == String, Self: BinaryEncodable {
   public func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
     try container.encode(self.rawValue, encoding: .utf8, terminator: nil)
   }
 }

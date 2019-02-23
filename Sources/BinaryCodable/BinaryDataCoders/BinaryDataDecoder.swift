@@ -55,7 +55,7 @@ public struct BinaryDataDecoder {
 private struct _BinaryDataDecoder: BinaryDecoder {
   var bufferedData: BufferedData
   let userInfo: [BinaryCodingUserInfoKey: Any]
-  let container: SequentialBinaryDecodingContainer?
+  let container: BinaryDecodingContainer?
 
   init(bufferedData: BufferedData, userInfo: [BinaryCodingUserInfoKey: Any]) {
     self.bufferedData = bufferedData
@@ -63,13 +63,13 @@ private struct _BinaryDataDecoder: BinaryDecoder {
     self.container = nil
   }
 
-  init(bufferedData: BufferedData, userInfo: [BinaryCodingUserInfoKey: Any], container: SequentialBinaryDecodingContainer) {
+  init(bufferedData: BufferedData, userInfo: [BinaryCodingUserInfoKey: Any], container: BinaryDecodingContainer) {
     self.bufferedData = bufferedData
     self.userInfo = userInfo
     self.container = container
   }
 
-  func sequentialContainer(maxLength: Int?) -> SequentialBinaryDecodingContainer {
+  func container(maxLength: Int?) -> BinaryDecodingContainer {
     if let maxLength = maxLength, let container = container as? BinaryDataDecodingContainer, let remainingLength = container.remainingLength {
       return BinaryDataDecodingContainer(bufferedData: bufferedData,
                                          maxLength: min(maxLength, remainingLength),
@@ -85,7 +85,7 @@ private struct _BinaryDataDecoder: BinaryDecoder {
 }
 
 // This needs to be a class instead of a struct because we hold a mutating reference in decode<T>.
-private class BinaryDataDecodingContainer: SequentialBinaryDecodingContainer {
+private class BinaryDataDecodingContainer: BinaryDecodingContainer {
   var bufferedData: BufferedData
   var remainingLength: Int?
   let userInfo: [BinaryCodingUserInfoKey: Any]
@@ -141,7 +141,7 @@ private class BinaryDataDecodingContainer: SequentialBinaryDecodingContainer {
     return data
   }
 
-  func nestedContainer(maxLength: Int?) -> SequentialBinaryDecodingContainer {
+  func nestedContainer(maxLength: Int?) -> BinaryDecodingContainer {
     let length: Int?
     if let remainingLength = remainingLength, let maxLength = maxLength {
       length = min(remainingLength, maxLength)

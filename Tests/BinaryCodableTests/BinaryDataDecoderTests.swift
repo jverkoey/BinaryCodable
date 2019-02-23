@@ -18,7 +18,7 @@ import XCTest
 private struct Packet: BinaryDecodable {
   let data: Data
   init(from decoder: BinaryDecoder) throws {
-    var container = decoder.sequentialContainer(maxLength: nil)
+    var container = decoder.container(maxLength: nil)
     let payloadLength = try container.decode(UInt32.self)
     self.data = try container.decode(length: Int(payloadLength))
   }

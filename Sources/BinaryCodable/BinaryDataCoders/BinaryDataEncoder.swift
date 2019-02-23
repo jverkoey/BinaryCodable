@@ -40,12 +40,12 @@ private final class BinaryDataEncoderStorage {
 private struct _BinaryDataEncoder: BinaryEncoder {
   var storage = BinaryDataEncoderStorage()
 
-  func sequentialContainer() -> SequentialBinaryEncodingContainer {
+  func container() -> BinaryEncodingContainer {
     return BinaryDataEncodingContainer(encoder: self)
   }
 }
 
-private struct BinaryDataEncodingContainer: SequentialBinaryEncodingContainer {
+private struct BinaryDataEncodingContainer: BinaryEncodingContainer {
   let encoder: _BinaryDataEncoder
   init(encoder: _BinaryDataEncoder) {
     self.encoder = encoder

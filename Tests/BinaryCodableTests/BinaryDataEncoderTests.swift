@@ -19,7 +19,7 @@ private struct Packet: BinaryEncodable {
   let data: Data
 
   func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
     try container.encode(UInt32(data.count))
     try container.encode(sequence: data)
   }
