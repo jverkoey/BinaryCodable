@@ -54,6 +54,8 @@ extension ProtobufTests {
         ("testProtoCompiler", testProtoCompiler),
         ("testProtoCompilerPipeline", testProtoCompilerPipeline),
         ("testVarInt320Decoding", testVarInt320Decoding),
+        ("testVarInt32NegativeValueDecoding", testVarInt32NegativeValueDecoding),
+        ("testVarInt32OverflowFailsToCompile", testVarInt32OverflowFailsToCompile),
         ("testVarInt32PositiveValueDecoding", testVarInt32PositiveValueDecoding),
     ]
 }

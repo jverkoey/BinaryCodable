@@ -104,6 +104,21 @@ class ProtobufTests: XCTestCase {
     }
   }
 
+  func testVarInt32OverflowFailsToCompile() throws {
+    // Given
+    let value = UInt32.max
+
+    XCTAssertThrowsError(try compileProto(definition: """
+      message int_value {
+        int32 int_value = 1;
+      }
+      """, message: "int_value", content: """
+      int_value: \(value)
+      """), "Failed to compile") { error in
+      XCTAssertTrue(error is ProtoCompilerError)
+    }
+  }
+
   func testVarInt32NegativeValueDecoding() throws {
     // Given
     let valuesToTest: [Int32] = [
@@ -204,6 +219,7 @@ class ProtobufTests: XCTestCase {
     let input = temporaryFile()
     let proto = temporaryFile()
     let output = temporaryFile()
+    let errors = temporaryFile()
 
     let package = "\(type(of: self))"
     let header = """
@@ -219,6 +235,7 @@ class ProtobufTests: XCTestCase {
     task.launchPath = environment.protocPath
     task.standardInput = try FileHandle(forReadingFrom: input)
     task.standardOutput = try FileHandle(forWritingTo: output)
+    task.standardError = try FileHandle(forWritingTo: errors)
     task.arguments = [
       "--encode",
       "\(package).\(message)",
@@ -229,8 +246,17 @@ class ProtobufTests: XCTestCase {
     task.launch()
     task.waitUntilExit()
 
+    let errorText = try String(contentsOf: errors)
+    if !errorText.isEmpty {
+      throw ProtoCompilerError.producedErrorOutput(stderr: errorText)
+    }
+
     return try Data(contentsOf: output)
   }
+}
+
+private enum ProtoCompilerError: Error {
+  case producedErrorOutput(stderr: String)
 }
 
 private func temporaryFile() -> URL {
