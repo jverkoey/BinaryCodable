@@ -15,7 +15,7 @@
 import XCTest
 @testable import BinaryCodable
 
-final class Tests: XCTestCase {
+final class FixedWidthIntegerBytesTests: XCTestCase {
 
   func testUInt8IsOneByte() {
     // Given

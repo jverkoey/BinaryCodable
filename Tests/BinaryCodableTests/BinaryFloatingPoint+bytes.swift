@@ -12,25 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import BinaryCodable
-import Foundation
+import XCTest
+@testable import BinaryCodable
 
-struct Message: ProtoDecodable {
-  // Intentionally shown here unordered.
-  var value1: Int32 = 0
-  var value4: Float = 0
-  var value2: UInt32 = 0
-  var value3: Int32 = 0
+final class BinaryFloatingPointBytesTests: XCTestCase {
 
-  static func fieldDescriptor(for key: CodingKey) -> Field? {
-    guard let codingKey = key as? CodingKeys else {
-      return nil
-    }
-    switch codingKey {
-    case .value1: return Field(number: 1, type: .int32)
-    case .value2: return Field(number: 2, type: .uint32)
-    case .value3: return Field(number: 3, type: .sint32)
-    case .value4: return Field(number: 4, type: .float)
-    }
+  func testFloatIsFourBytes() {
+    // Given
+    let value: Float = 3.14159
+
+    // When
+    let bytes = value.bytes
+
+    // Then
+    XCTAssertEqual(bytes.count, 4)
+  }
+
+  func testDoubleIsFourBytes() {
+    // Given
+    let value: Double = 3.14159
+
+    // When
+    let bytes = value.bytes
+
+    // Then
+    XCTAssertEqual(bytes.count, 8)
   }
 }

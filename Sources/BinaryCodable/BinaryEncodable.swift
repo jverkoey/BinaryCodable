@@ -91,11 +91,18 @@ public protocol BinaryEncodingContainer {
   mutating func encode(_ value: String, encoding: String.Encoding, terminator: UInt8?) throws
 
   /**
-   Encodes a value of the given type.
+   Encodes a value of the given integer type.
 
    - parameter value: The value to encode.
    */
-  mutating func encode<IntegerType: FixedWidthInteger>(_ value: IntegerType) throws
+  mutating func encode<T: FixedWidthInteger>(_ value: T) throws
+
+  /**
+   Encodes a value of the given floating point type.
+
+   - parameter value: The value to encode.
+   */
+  mutating func encode<T: BinaryFloatingPoint>(_ value: T) throws
 
   /**
    Encodes a value of the given type.
@@ -115,6 +122,13 @@ public protocol BinaryEncodingContainer {
 // MARK: RawRepresentable extensions
 
 extension RawRepresentable where RawValue: FixedWidthInteger, Self: BinaryEncodable {
+  public func encode(to encoder: BinaryEncoder) throws {
+    var container = encoder.container()
+    try container.encode(self.rawValue)
+  }
+}
+
+extension RawRepresentable where RawValue: BinaryFloatingPoint, Self: BinaryEncodable {
   public func encode(to encoder: BinaryEncoder) throws {
     var container = encoder.container()
     try container.encode(self.rawValue)

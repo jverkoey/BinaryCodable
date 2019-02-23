@@ -51,7 +51,11 @@ private struct BinaryDataEncodingContainer: BinaryEncodingContainer {
     self.encoder = encoder
   }
 
-  func encode<IntegerType: FixedWidthInteger>(_ value: IntegerType) throws {
+  func encode<T: FixedWidthInteger>(_ value: T) throws {
+    encoder.storage.data.append(contentsOf: value.bytes)
+  }
+
+  func encode<T: BinaryFloatingPoint>(_ value: T) throws {
     encoder.storage.data.append(contentsOf: value.bytes)
   }
 

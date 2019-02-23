@@ -21,6 +21,7 @@ struct Field {
     case int32
     case uint32
     case sint32
+    case float
   }
   let type: FieldType
 }
@@ -101,7 +102,20 @@ private struct ProtoKeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContain
   }
 
   func decode(_ type: Float.Type, forKey key: Key) throws -> Float {
-    preconditionFailure("Unimplemented")
+    guard let fieldDescriptor = decoder.fieldDescriptor(key) else {
+      throw DecodingError.keyNotFound(key, .init(codingPath: codingPath,
+                                                 debugDescription: "No field descriptor provided for \(key)."))
+    }
+    guard let message = decoder.mappedMessages[fieldDescriptor.number] else {
+      throw DecodingError.valueNotFound(type, .init(codingPath: codingPath,
+                                                    debugDescription: "No value found for \(key) of type \(type)."))
+    }
+    switch (fieldDescriptor.type, message.value) {
+    case (.float, .fixed32(let value)):
+      return value
+    default:
+      preconditionFailure("Unimplemented")
+    }
   }
 
   func decode(_ type: Int.Type, forKey key: Key) throws -> Int {
@@ -153,14 +167,13 @@ private struct ProtoKeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContain
       throw DecodingError.valueNotFound(T.self, .init(codingPath: codingPath,
                                                       debugDescription: "No value found for \(key) of type \(type)."))
     }
-    switch message.value {
-    case .varint(let rawValue):
-      switch fieldDescriptor.type {
-      case .int32, .uint32:
-        return T.init(clamping: rawValue)
-      case .sint32:
-        return T.init(clamping: Int32(rawValue >> 1) ^ -Int32(rawValue & 1))
-      }
+    switch (fieldDescriptor.type, message.value) {
+    case (.int32, .varint(let rawValue)), (.uint32, .varint(let rawValue)):
+      return T.init(clamping: rawValue)
+    case (.sint32, .varint(let rawValue)):
+      return T.init(clamping: Int32(rawValue >> 1) ^ -Int32(rawValue & 1))
+    default:
+      preconditionFailure("Unimplemented")
     }
   }
 

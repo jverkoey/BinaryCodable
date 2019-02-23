@@ -109,7 +109,15 @@ public protocol BinaryDecodingContainer {
    - parameter type: The type of value to decode.
    - returns: A value of the requested type.
    */
-  mutating func decode<IntegerType: FixedWidthInteger>(_ type: IntegerType.Type) throws -> IntegerType
+  mutating func decode<T: FixedWidthInteger>(_ type: T.Type) throws -> T
+
+  /**
+   Decodes a value of the given type.
+
+   - parameter type: The type of value to decode.
+   - returns: A value of the requested type.
+   */
+  mutating func decode<T: BinaryFloatingPoint>(_ type: T.Type) throws -> T
 
   /**
    Decodes a value of the given type.
@@ -147,11 +155,9 @@ public protocol BinaryDecodingContainer {
 
 // MARK: RawRepresentable extensions
 
-// Primarily for enums with some FixedWidthInteger raw value
 extension RawRepresentable where RawValue: FixedWidthInteger, Self: BinaryDecodable {
   public init(from decoder: BinaryDecoder) throws {
-    let byteWidth = RawValue.bitWidth / 8
-    var container = decoder.container(maxLength: byteWidth)
+    var container = decoder.container(maxLength: nil)
     let decoded = try container.decode(RawValue.self)
     guard let value = Self(rawValue: decoded) else {
       throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
@@ -161,7 +167,18 @@ extension RawRepresentable where RawValue: FixedWidthInteger, Self: BinaryDecoda
   }
 }
 
-// Primarily for enums with a String raw value
+extension RawRepresentable where RawValue: BinaryFloatingPoint, Self: BinaryDecodable {
+  public init(from decoder: BinaryDecoder) throws {
+    var container = decoder.container(maxLength: nil)
+    let decoded = try container.decode(RawValue.self)
+    guard let value = Self(rawValue: decoded) else {
+      throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
+        "Cannot initialize \(Self.self) from invalid \(RawValue.self) value \(decoded)"))
+    }
+    self = value
+  }
+}
+
 extension RawRepresentable where RawValue == String, Self: BinaryDecodable {
   public init(from decoder: BinaryDecoder) throws {
     var container = decoder.container(maxLength: nil)

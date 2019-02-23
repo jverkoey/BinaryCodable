@@ -397,6 +397,65 @@ class ProtobufTests: XCTestCase {
     }
   }
 
+  // MARK: float
+
+  func testFloat0Decoding() throws {
+    // Given
+    do {
+      let data = try compileProto(definition: """
+        message float_value {
+          float float_value = 1;
+        }
+        """, message: "float_value", content: """
+        float_value: 0
+        """)
+      let decoder = BinaryDataDecoder()
+
+      // When
+      let messages = try decoder.decode([ProtoMessage].self, from: data)
+
+      // Then
+      XCTAssertEqual(messages.count, 0)
+    } catch let error {
+      XCTFail(String(describing: error))
+    }
+  }
+
+  func testFloatValueDecoding() throws {
+    // Given
+    let valuesToTest: [Float] = [
+      -Float.greatestFiniteMagnitude, -3.14159, -1, 1, 3.14159, Float.greatestFiniteMagnitude,
+    ]
+
+    for value in valuesToTest {
+      let data = try compileProto(definition: """
+        message float_value {
+          float float_value = 1;
+        }
+        """, message: "float_value", content: """
+        float_value: \(String(format: "%0.20f", value))
+        """)
+      let decoder = BinaryDataDecoder()
+
+      // When
+      do {
+        let messages = try decoder.decode([ProtoMessage].self, from: data)
+
+        // Then
+        XCTAssertEqual(messages.count, 1)
+        guard let message = messages.first else {
+          continue
+        }
+        XCTAssertEqual(message.fieldNumber, 1)
+        // sint values will be zig-zag encoded.
+        // https://developers.google.com/protocol-buffers/docs/encoding#signed-integers
+        XCTAssertEqual(message.value, .fixed32(rawValue: value))
+      } catch let error {
+        XCTFail("Value \(value): \(String(describing: error))")
+      }
+    }
+  }
+
   // MARK: Generated messages
 
   func testGeneratedMessageDecoding() throws {
@@ -407,11 +466,13 @@ class ProtobufTests: XCTestCase {
           int32 first_value = 1;
           uint32 second_value = 2;
           sint32 third_value = 3;
+          float fourth_value = 4;
         }
         """, message: "int_value", content: """
+        third_value: 268435456
         first_value: 1
         second_value: \(UInt32.max)
-        third_value: 268435456
+        fourth_value: 1.5234
         """)
       let decoder = ProtoDecoder()
 

@@ -102,8 +102,30 @@ private class BinaryDataDecodingContainer: BinaryDecodingContainer {
     return bufferedData.isAtEnd
   }
 
-  func decode<IntegerType: FixedWidthInteger>(_ type: IntegerType.Type) throws -> IntegerType {
-    return try decodeFixedWidthInteger(type)
+  func decode<T: BinaryFloatingPoint>(_ type: T.Type) throws -> T {
+    let byteWidth = (type.significandBitCount + type.exponentBitCount + 1) / 8
+    let bytes = try pullData(length: byteWidth)
+    if bytes.count < byteWidth {
+      throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
+        "Not enough data to create a a type of \(type). Needed: \(byteWidth). Received: \(bytes.count)."))
+    }
+    let value = Data(bytes).withUnsafeBytes { (ptr: UnsafePointer<T>) -> T in
+      return ptr.pointee
+    }
+    return value
+  }
+
+  func decode<T: FixedWidthInteger>(_ type: T.Type) throws -> T {
+    let byteWidth = type.bitWidth / 8
+    let bytes = try pullData(length: byteWidth)
+    if bytes.count < byteWidth {
+      throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
+        "Not enough data to create a a type of \(type). Needed: \(byteWidth). Received: \(bytes.count)."))
+    }
+    let value = Data(bytes).withUnsafeBytes { (ptr: UnsafePointer<T>) -> T in
+      return ptr.pointee
+    }
+    return value
   }
 
   func decodeString(encoding: String.Encoding, terminator: UInt8?) throws -> String {
@@ -180,19 +202,6 @@ private class BinaryDataDecodingContainer: BinaryDecodingContainer {
         "Not enough bytes available to decode. Requested \(length), but received \(data.count)."))
     }
     return data
-  }
-
-  func decodeFixedWidthInteger<T>(_ type: T.Type) throws -> T where T: FixedWidthInteger {
-    let byteWidth = type.bitWidth / 8
-    let bytes = try pullData(length: byteWidth)
-    if bytes.count < byteWidth {
-      throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
-        "Not enough data to create a a type of \(type). Needed: \(byteWidth). Received: \(bytes.count)."))
-    }
-    let value = Data(bytes).withUnsafeBytes { (ptr: UnsafePointer<T>) -> T in
-      return ptr.pointee
-    }
-    return value
   }
 
   private func containedBuffer() -> BufferedData {

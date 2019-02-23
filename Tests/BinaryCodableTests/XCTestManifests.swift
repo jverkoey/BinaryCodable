@@ -16,11 +16,28 @@ extension ArrayEncoderTests {
     ]
 }
 
+extension BinaryFloatingPointBytesTests {
+    static let __allTests = [
+        ("testDoubleIsFourBytes", testDoubleIsFourBytes),
+        ("testFloatIsFourBytes", testFloatIsFourBytes),
+    ]
+}
+
 extension BufferedDataTests {
     static let __allTests = [
         ("testInitiallyPullsFromStart", testInitiallyPullsFromStart),
         ("testPullingMoreThanAvailableOnlyPullsWhatsAvailable", testPullingMoreThanAvailableOnlyPullsWhatsAvailable),
         ("testSuccessivePullsUseCursor", testSuccessivePullsUseCursor),
+    ]
+}
+
+extension FixedWidthIntegerBytesTests {
+    static let __allTests = [
+        ("testIntDependsOnThePlatform", testIntDependsOnThePlatform),
+        ("testUInt16IsTwoBytesInLittleEndian", testUInt16IsTwoBytesInLittleEndian),
+        ("testUInt32IsFourBytesInLittleEndian", testUInt32IsFourBytesInLittleEndian),
+        ("testUInt64IsEightBytesInLittleEndian", testUInt64IsEightBytesInLittleEndian),
+        ("testUInt8IsOneByte", testUInt8IsOneByte),
     ]
 }
 
@@ -49,6 +66,8 @@ extension LengthEncodedPacketEncoderTests {
 
 extension ProtobufTests {
     static let __allTests = [
+        ("testFloat0Decoding", testFloat0Decoding),
+        ("testFloatValueDecoding", testFloatValueDecoding),
         ("testGeneratedMessageDecoding", testGeneratedMessageDecoding),
         ("testInt320Decoding", testInt320Decoding),
         ("testInt32NegativeValueDecoding", testInt32NegativeValueDecoding),
@@ -66,27 +85,18 @@ extension ProtobufTests {
     ]
 }
 
-extension Tests {
-    static let __allTests = [
-        ("testIntDependsOnThePlatform", testIntDependsOnThePlatform),
-        ("testUInt16IsTwoBytesInLittleEndian", testUInt16IsTwoBytesInLittleEndian),
-        ("testUInt32IsFourBytesInLittleEndian", testUInt32IsFourBytesInLittleEndian),
-        ("testUInt64IsEightBytesInLittleEndian", testUInt64IsEightBytesInLittleEndian),
-        ("testUInt8IsOneByte", testUInt8IsOneByte),
-    ]
-}
-
 #if !os(macOS)
 public func __allTests() -> [XCTestCaseEntry] {
     return [
         testCase(ArrayDecoderTests.__allTests),
         testCase(ArrayEncoderTests.__allTests),
+        testCase(BinaryFloatingPointBytesTests.__allTests),
         testCase(BufferedDataTests.__allTests),
+        testCase(FixedWidthIntegerBytesTests.__allTests),
         testCase(GIFDecoderTests.__allTests),
         testCase(LengthEncodedPacketDecoderTests.__allTests),
         testCase(LengthEncodedPacketEncoderTests.__allTests),
         testCase(ProtobufTests.__allTests),
-        testCase(Tests.__allTests),
     ]
 }
 #endif
