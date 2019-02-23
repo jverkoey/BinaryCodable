@@ -47,6 +47,17 @@ extension LengthEncodedPacketEncoderTests {
     ]
 }
 
+extension ProtobufTests {
+    static let __allTests = [
+        ("testGeneratedMessageDecoding", testGeneratedMessageDecoding),
+        ("testMultipleInt32Decoding", testMultipleInt32Decoding),
+        ("testProtoCompiler", testProtoCompiler),
+        ("testProtoCompilerPipeline", testProtoCompilerPipeline),
+        ("testVarInt320Decoding", testVarInt320Decoding),
+        ("testVarInt32PositiveValueDecoding", testVarInt32PositiveValueDecoding),
+    ]
+}
+
 extension Tests {
     static let __allTests = [
         ("testIntDependsOnThePlatform", testIntDependsOnThePlatform),
@@ -66,6 +77,7 @@ public func __allTests() -> [XCTestCaseEntry] {
         testCase(GIFDecoderTests.__allTests),
         testCase(LengthEncodedPacketDecoderTests.__allTests),
         testCase(LengthEncodedPacketEncoderTests.__allTests),
+        testCase(ProtobufTests.__allTests),
         testCase(Tests.__allTests),
     ]
 }
