@@ -1,6 +1,6 @@
 import XCTest
 
-extension BinaryDataDecoderTests {
+extension ArrayDecoderTests {
     static let __allTests = [
         ("testEmpty", testEmpty),
         ("testMultipleByte", testMultipleByte),
@@ -8,7 +8,7 @@ extension BinaryDataDecoderTests {
     ]
 }
 
-extension BinaryDataEncoderTests {
+extension ArrayEncoderTests {
     static let __allTests = [
         ("testEmptyLength", testEmptyLength),
         ("testMultipleByte", testMultipleByte),
@@ -31,6 +31,22 @@ extension GIFDecoderTests {
     ]
 }
 
+extension LengthEncodedPacketDecoderTests {
+    static let __allTests = [
+        ("testEmpty", testEmpty),
+        ("testMultipleByte", testMultipleByte),
+        ("testOneByte", testOneByte),
+    ]
+}
+
+extension LengthEncodedPacketEncoderTests {
+    static let __allTests = [
+        ("testEmptyLength", testEmptyLength),
+        ("testMultipleByte", testMultipleByte),
+        ("testOneByte", testOneByte),
+    ]
+}
+
 extension Tests {
     static let __allTests = [
         ("testIntDependsOnThePlatform", testIntDependsOnThePlatform),
@@ -44,10 +60,12 @@ extension Tests {
 #if !os(macOS)
 public func __allTests() -> [XCTestCaseEntry] {
     return [
-        testCase(BinaryDataDecoderTests.__allTests),
-        testCase(BinaryDataEncoderTests.__allTests),
+        testCase(ArrayDecoderTests.__allTests),
+        testCase(ArrayEncoderTests.__allTests),
         testCase(BufferedDataTests.__allTests),
         testCase(GIFDecoderTests.__allTests),
+        testCase(LengthEncodedPacketDecoderTests.__allTests),
+        testCase(LengthEncodedPacketEncoderTests.__allTests),
         testCase(Tests.__allTests),
     ]
 }

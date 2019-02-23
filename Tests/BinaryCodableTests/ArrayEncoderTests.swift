@@ -25,41 +25,41 @@ private struct Packet: BinaryEncodable {
   }
 }
 
-final class BinaryDataEncoderTests: XCTestCase {
+final class ArrayEncoderTests: XCTestCase {
 
   func testEmptyLength() throws {
     // Given
-    let packet = Packet(data: Data([]))
+    let packets = [Packet(data: Data([])), Packet(data: Data([]))]
     let encoder = BinaryDataEncoder()
 
     // When
-    let packetData = try encoder.encode(packet)
+    let packetData = try encoder.encode(packets)
 
     // Then
-    XCTAssertEqual([UInt8](packetData), [0, 0, 0, 0])
+    XCTAssertEqual([UInt8](packetData), [0, 0, 0, 0, 0, 0, 0, 0])
   }
 
   func testOneByte() throws {
     // Given
-    let packet = Packet(data: Data([127]))
+    let packets = [Packet(data: Data([127])), Packet(data: Data([32]))]
     let encoder = BinaryDataEncoder()
 
     // When
-    let packetData = try encoder.encode(packet)
+    let packetData = try encoder.encode(packets)
 
     // Then
-    XCTAssertEqual([UInt8](packetData), [1, 0, 0, 0, 127])
+    XCTAssertEqual([UInt8](packetData), [1, 0, 0, 0, 127, 1, 0, 0, 0, 32])
   }
 
   func testMultipleByte() throws {
     // Given
-    let packet = Packet(data: Data([127, 32, 48, 12, 10]))
+    let packets = [Packet(data: Data([127, 32, 48, 12, 10])), Packet(data: Data([10, 15, 0, 255]))]
     let encoder = BinaryDataEncoder()
 
     // When
-    let packetData = try encoder.encode(packet)
+    let packetData = try encoder.encode(packets)
 
     // Then
-    XCTAssertEqual([UInt8](packetData), [5, 0, 0, 0, 127, 32, 48, 12, 10])
+    XCTAssertEqual([UInt8](packetData), [5, 0, 0, 0, 127, 32, 48, 12, 10, 4, 0, 0, 0, 10, 15, 0, 255])
   }
 }

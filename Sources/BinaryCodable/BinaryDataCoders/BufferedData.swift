@@ -32,7 +32,7 @@ public final class BufferedData {
   /**
    Whether the buffer's internal cursor has reached the end of the available content.
    */
-  public var isAtEnd: Bool = false
+  public var isAtEnd: Bool { return reader.isAtEnd }
 
   /**
    - parameter reader: An object that implements mechanisms for retrieving data that can be added to the buffer.
@@ -52,7 +52,6 @@ public final class BufferedData {
   public func peek(maxLength: Int) throws -> Data {
     while buffer.count < maxLength {
       guard let data = try reader.read(length: maxLength - buffer.count) else {
-        isAtEnd = true
         break
       }
       buffer.append(data)
@@ -71,7 +70,6 @@ public final class BufferedData {
   public func read(maxBytes: Int) throws -> Data {
     while buffer.count < maxBytes {
       guard let data = try reader.read(length: maxBytes - buffer.count) else {
-        isAtEnd = true
         break
       }
       buffer.append(data)
@@ -93,7 +91,6 @@ public final class BufferedData {
     var indexOfDelimiter = buffer.firstIndex(of: delimiter)
     while indexOfDelimiter == nil {
       guard let data = try reader.read(length: 1) else {
-        isAtEnd = true
         break
       }
       if let subIndex = data.firstIndex(of: delimiter) {

@@ -127,3 +127,12 @@ extension RawRepresentable where RawValue == String, Self: BinaryEncodable {
     try container.encode(self.rawValue, encoding: .utf8, terminator: nil)
   }
 }
+
+extension Array: BinaryEncodable where Element: BinaryEncodable {
+  public func encode(to encoder: BinaryEncoder) throws {
+    var container = encoder.container()
+    for element in self {
+      try container.encode(element)
+    }
+  }
+}

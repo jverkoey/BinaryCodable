@@ -173,3 +173,15 @@ extension RawRepresentable where RawValue == String, Self: BinaryDecodable {
     self = value
   }
 }
+
+extension Array: BinaryDecodable where Element: BinaryDecodable {
+  public init(from decoder: BinaryDecoder) throws {
+    self.init()
+
+    var container = decoder.container(maxLength: nil)
+    while !container.isAtEnd {
+      let element = try container.decode(Element.self)
+      append(element)
+    }
+  }
+}
