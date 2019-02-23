@@ -60,6 +60,9 @@ extension ProtobufTests {
         ("testMultipleInt32Decoding", testMultipleInt32Decoding),
         ("testProtoCompiler", testProtoCompiler),
         ("testProtoCompilerPipeline", testProtoCompilerPipeline),
+        ("testSInt320Decoding", testSInt320Decoding),
+        ("testSInt32NegativeValueDecoding", testSInt32NegativeValueDecoding),
+        ("testSInt32PositiveValueDecoding", testSInt32PositiveValueDecoding),
     ]
 }
 

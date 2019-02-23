@@ -295,6 +295,108 @@ class ProtobufTests: XCTestCase {
     }
   }
 
+  // MARK: sint32
+
+  func testSInt320Decoding() throws {
+    // Given
+    do {
+      let data = try compileProto(definition: """
+        message int_value {
+          sint32 int_value = 1;
+        }
+        """, message: "int_value", content: """
+        int_value: 0
+        """)
+      let decoder = BinaryDataDecoder()
+
+      // When
+      let messages = try decoder.decode([ProtoMessage].self, from: data)
+
+      // Then
+      XCTAssertEqual(messages.count, 0)
+    } catch let error {
+      XCTFail(String(describing: error))
+    }
+  }
+
+  func testSInt32PositiveValueDecoding() throws {
+    // Given
+    let valuesToTest: [Int32] = [
+      1, 127, // 1 byte range
+      128, 16383, // 2 byte range
+      16384, 2097151, // 3 byte range
+      2097152, 268435455, // 4 byte range
+      268435456, Int32.max, // 5 byte range
+    ]
+
+    for value in valuesToTest {
+      let data = try compileProto(definition: """
+        message int_value {
+          sint32 int_value = 1;
+        }
+        """, message: "int_value", content: """
+        int_value: \(value)
+        """)
+      let decoder = BinaryDataDecoder()
+
+      // When
+      do {
+        let messages = try decoder.decode([ProtoMessage].self, from: data)
+
+        // Then
+        XCTAssertEqual(messages.count, 1)
+        guard let message = messages.first else {
+          continue
+        }
+        XCTAssertEqual(message.fieldNumber, 1)
+        // sint values will be zig-zag encoded.
+        // https://developers.google.com/protocol-buffers/docs/encoding#signed-integers
+        XCTAssertEqual(message.value, .varint(rawValue: UInt64(UInt32(bitPattern: (value << 1) ^ (value >> 31)))))
+      } catch let error {
+        XCTFail("Value \(value): \(String(describing: error))")
+      }
+    }
+  }
+
+  func testSInt32NegativeValueDecoding() throws {
+    // Given
+    let valuesToTest: [Int32] = [
+      -1, -127,
+      -128, -16383,
+      -16384, -2097151,
+      -2097152, -268435455,
+      -268435456, Int32.min,
+    ]
+
+    for value in valuesToTest {
+      let data = try compileProto(definition: """
+        message int_value {
+          sint32 int_value = 1;
+        }
+        """, message: "int_value", content: """
+        int_value: \(value)
+        """)
+      let decoder = BinaryDataDecoder()
+
+      // When
+      do {
+        let messages = try decoder.decode([ProtoMessage].self, from: data)
+
+        // Then
+        XCTAssertEqual(messages.count, 1)
+        guard let message = messages.first else {
+          continue
+        }
+        XCTAssertEqual(message.fieldNumber, 1)
+        // sint values will be zig-zag encoded.
+        // https://developers.google.com/protocol-buffers/docs/encoding#signed-integers
+        XCTAssertEqual(message.value, .varint(rawValue: UInt64(UInt32(bitPattern: (value << 1) ^ (value >> 31)))))
+      } catch let error {
+        XCTFail("Value \(value): \(String(describing: error))")
+      }
+    }
+  }
+
   // MARK: Generated messages
 
   func testGeneratedMessageDecoding() throws {
