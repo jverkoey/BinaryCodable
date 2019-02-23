@@ -45,7 +45,9 @@ class ProtobufTests: XCTestCase {
     XCTAssertEqual([UInt8](data), [0x08, 0x01])
   }
 
-  func testVarInt320Decoding() throws {
+  // MARK: int32
+
+  func testInt320Decoding() throws {
     // Given
     let data = try compileProto(definition: """
       message int_value {
@@ -67,7 +69,7 @@ class ProtobufTests: XCTestCase {
     }
   }
 
-  func testVarInt32PositiveValueDecoding() throws {
+  func testInt32PositiveValueDecoding() throws {
     // Given
     let valuesToTest: [Int32] = [
       1, 127, // 1 byte range
@@ -104,7 +106,7 @@ class ProtobufTests: XCTestCase {
     }
   }
 
-  func testVarInt32OverflowFailsToCompile() throws {
+  func testInt32OverflowFailsToCompile() throws {
     // Given
     let value = UInt32.max
 
@@ -119,7 +121,7 @@ class ProtobufTests: XCTestCase {
     }
   }
 
-  func testVarInt32NegativeValueDecoding() throws {
+  func testInt32NegativeValueDecoding() throws {
     // Given
     let valuesToTest: [Int32] = [
       -1, -127,
@@ -186,6 +188,114 @@ class ProtobufTests: XCTestCase {
       XCTFail(String(describing: error))
     }
   }
+
+  // MARK: int64
+
+  func testInt640Decoding() throws {
+    // Given
+    do {
+      let data = try compileProto(definition: """
+        message int_value {
+          int64 int_value = 1;
+        }
+        """, message: "int_value", content: """
+        int_value: 0
+        """)
+      let decoder = BinaryDataDecoder()
+
+    // When
+      let messages = try decoder.decode([ProtoMessage].self, from: data)
+
+      // Then
+      XCTAssertEqual(messages.count, 0)
+    } catch let error {
+      XCTFail(String(describing: error))
+    }
+  }
+
+  func testInt64PositiveValueDecoding() throws {
+    // Given
+    let valuesToTest: [Int64] = [
+      1, 127, // 1 byte range
+      128, 16383, // 2 byte range
+      16384, 2097151, // 3 byte range
+      2097152, 268435455, // 4 byte range
+      268435456, 34359738367, // 5 byte range
+      34359738368, 4398046511103, // 6 byte range
+      4398046511104, 562949953421311, // 7 byte range
+      562949953421312, 72057594037927935, // 8 byte range
+      72057594037927936, Int64.max, // 9 byte range
+    ]
+
+    for value in valuesToTest {
+      let data = try compileProto(definition: """
+        message int_value {
+          int64 int_value = 1;
+        }
+        """, message: "int_value", content: """
+        int_value: \(value)
+        """)
+      let decoder = BinaryDataDecoder()
+
+      // When
+      do {
+        let messages = try decoder.decode([ProtoMessage].self, from: data)
+
+        // Then
+        XCTAssertEqual(messages.count, 1)
+        guard let message = messages.first else {
+          continue
+        }
+        XCTAssertEqual(message.fieldNumber, 1)
+        XCTAssertEqual(message.value, .varint(rawValue: UInt64(value)))
+      } catch let error {
+        XCTFail("Value \(value): \(String(describing: error))")
+      }
+    }
+  }
+
+  func testInt64NegativeValueDecoding() throws {
+    // Given
+    let valuesToTest: [Int64] = [
+      -1, -127,
+      -128, -16383,
+      -16384, -2097151,
+      -2097152, -268435455,
+      -268435456, -34359738367,
+      -34359738368, -4398046511103,
+      -4398046511104, -562949953421311,
+      -562949953421312, -72057594037927935,
+      -72057594037927936, Int64.min
+    ]
+
+    for value in valuesToTest {
+      let data = try compileProto(definition: """
+        message int_value {
+          int64 int_value = 1;
+        }
+        """, message: "int_value", content: """
+        int_value: \(value)
+        """)
+      let decoder = BinaryDataDecoder()
+
+      // When
+      do {
+        let messages = try decoder.decode([ProtoMessage].self, from: data)
+
+        // Then
+        XCTAssertEqual(messages.count, 1)
+        guard let message = messages.first else {
+          continue
+        }
+        XCTAssertEqual(message.fieldNumber, 1)
+        XCTAssertEqual(message.value, .varint(rawValue: UInt64(bitPattern: Int64(value))))
+      } catch let error {
+        XCTFail("Value \(value): \(String(describing: error))")
+      }
+    }
+  }
+
+  // MARK: Generated messages
 
   func testGeneratedMessageDecoding() throws {
     // Given

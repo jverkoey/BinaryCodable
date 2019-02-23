@@ -50,13 +50,16 @@ extension LengthEncodedPacketEncoderTests {
 extension ProtobufTests {
     static let __allTests = [
         ("testGeneratedMessageDecoding", testGeneratedMessageDecoding),
+        ("testInt320Decoding", testInt320Decoding),
+        ("testInt32NegativeValueDecoding", testInt32NegativeValueDecoding),
+        ("testInt32OverflowFailsToCompile", testInt32OverflowFailsToCompile),
+        ("testInt32PositiveValueDecoding", testInt32PositiveValueDecoding),
+        ("testInt640Decoding", testInt640Decoding),
+        ("testInt64NegativeValueDecoding", testInt64NegativeValueDecoding),
+        ("testInt64PositiveValueDecoding", testInt64PositiveValueDecoding),
         ("testMultipleInt32Decoding", testMultipleInt32Decoding),
         ("testProtoCompiler", testProtoCompiler),
         ("testProtoCompilerPipeline", testProtoCompilerPipeline),
-        ("testVarInt320Decoding", testVarInt320Decoding),
-        ("testVarInt32NegativeValueDecoding", testVarInt32NegativeValueDecoding),
-        ("testVarInt32OverflowFailsToCompile", testVarInt32OverflowFailsToCompile),
-        ("testVarInt32PositiveValueDecoding", testVarInt32PositiveValueDecoding),
     ]
 }
 
