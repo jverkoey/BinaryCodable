@@ -397,6 +397,65 @@ class ProtobufTests: XCTestCase {
     }
   }
 
+  // MARK: double
+
+  func testDouble0Decoding() throws {
+    // Given
+    do {
+      let data = try compileProto(definition: """
+        message value {
+          double value = 1;
+        }
+        """, message: "value", content: """
+        value: 0
+        """)
+      let decoder = BinaryDataDecoder()
+
+      // When
+      let messages = try decoder.decode([ProtoMessage].self, from: data)
+
+      // Then
+      XCTAssertEqual(messages.count, 0)
+    } catch let error {
+      XCTFail(String(describing: error))
+    }
+  }
+
+  func testDoubleValueDecoding() throws {
+    // Given
+    let valuesToTest: [Double] = [
+      -Double.greatestFiniteMagnitude, -3.14159, -1, 1, 3.14159, Double.greatestFiniteMagnitude,
+    ]
+
+    for value in valuesToTest {
+      let data = try compileProto(definition: """
+        message value {
+          double value = 1;
+        }
+        """, message: "value", content: """
+        value: \(String(format: "%0.20f", value))
+        """)
+      let decoder = BinaryDataDecoder()
+
+      // When
+      do {
+        let messages = try decoder.decode([ProtoMessage].self, from: data)
+
+        // Then
+        XCTAssertEqual(messages.count, 1)
+        guard let message = messages.first else {
+          continue
+        }
+        XCTAssertEqual(message.fieldNumber, 1)
+        // sint values will be zig-zag encoded.
+        // https://developers.google.com/protocol-buffers/docs/encoding#signed-integers
+        XCTAssertEqual(message.value, .fixed64(rawValue: value))
+      } catch let error {
+        XCTFail("Value \(value): \(String(describing: error))")
+      }
+    }
+  }
+
   // MARK: float
 
   func testFloat0Decoding() throws {
@@ -425,7 +484,7 @@ class ProtobufTests: XCTestCase {
     // Given
     let valuesToTest: [Float] = [
       -Float.greatestFiniteMagnitude, -3.14159, -1, 1, 3.14159, Float.greatestFiniteMagnitude,
-    ]
+      ]
 
     for value in valuesToTest {
       let data = try compileProto(definition: """
