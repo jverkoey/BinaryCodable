@@ -23,6 +23,7 @@ struct Field {
     case int32
     case int64
     case uint32
+    case uint64
     case sint32
     case fixed32
     case fixed64
@@ -194,7 +195,8 @@ private struct ProtoKeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContain
     switch (fieldDescriptor.type, message.value) {
     case (.int32, .varint(let rawValue)),
          (.int64, .varint(let rawValue)),
-         (.uint32, .varint(let rawValue)): return T.init(clamping: rawValue)
+         (.uint32, .varint(let rawValue)),
+         (.uint64, .varint(let rawValue)): return T.init(clamping: rawValue)
     case (.sint32, .varint(let rawValue)): return T.init(clamping: Int32(rawValue >> 1) ^ -Int32(rawValue & 1))
     case (.fixed32, .fixed32(let rawValue)): return T.init(clamping: rawValue)
     case (.fixed64, .fixed64(let rawValue)): return T.init(clamping: rawValue)

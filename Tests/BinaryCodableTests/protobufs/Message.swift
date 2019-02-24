@@ -21,6 +21,7 @@ struct Message: ProtoDecodable {
   var int32Value: Int32?
   var int64Value: Int64?
   var uint32Value: UInt32?
+  var uint64Value: UInt64?
   var sint32Value: Int32?
   var fixed32Value: UInt32?
   var fixed64Value: UInt64?
@@ -36,6 +37,7 @@ struct Message: ProtoDecodable {
     case .int32Value: return Field(number: 3, type: .int32)
     case .int64Value: return Field(number: 4, type: .int64)
     case .uint32Value: return Field(number: 5, type: .uint32)
+    case .uint64Value: return Field(number: 6, type: .uint64)
     case .sint32Value: return Field(number: 7, type: .sint32)
     case .fixed32Value: return Field(number: 9, type: .fixed32)
     case .fixed64Value: return Field(number: 10, type: .fixed64)
