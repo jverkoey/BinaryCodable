@@ -55,7 +55,7 @@ public struct BinaryDataDecoder {
 private struct _BinaryDataDecoder: BinaryDecoder {
   var bufferedData: BufferedData
   let userInfo: [BinaryCodingUserInfoKey: Any]
-  let container: BinaryDecodingContainer?
+  let container: BinaryDataDecodingContainer?
 
   init(bufferedData: BufferedData, userInfo: [BinaryCodingUserInfoKey: Any]) {
     self.bufferedData = bufferedData
@@ -63,21 +63,23 @@ private struct _BinaryDataDecoder: BinaryDecoder {
     self.container = nil
   }
 
-  init(bufferedData: BufferedData, userInfo: [BinaryCodingUserInfoKey: Any], container: BinaryDecodingContainer) {
+  init(bufferedData: BufferedData, userInfo: [BinaryCodingUserInfoKey: Any], container: BinaryDataDecodingContainer) {
     self.bufferedData = bufferedData
     self.userInfo = userInfo
     self.container = container
   }
 
   func container(maxLength: Int?) -> BinaryDecodingContainer {
-    if let maxLength = maxLength, let container = container as? BinaryDataDecodingContainer, let remainingLength = container.remainingLength {
-      return BinaryDataDecodingContainer(bufferedData: bufferedData,
-                                         maxLength: min(maxLength, remainingLength),
-                                         userInfo: userInfo)
-    } else if let container = container as? BinaryDataDecodingContainer, let remainingLength = container.remainingLength {
-      return BinaryDataDecodingContainer(bufferedData: bufferedData,
-                                         maxLength: remainingLength,
-                                         userInfo: userInfo)
+    if let container = container, let remainingLength = container.remainingLength {
+      if let maxLength = maxLength {
+        return BinaryDataDecodingContainer(bufferedData: bufferedData,
+                                           maxLength: min(maxLength, remainingLength),
+                                           userInfo: userInfo)
+      } else {
+        return BinaryDataDecodingContainer(bufferedData: bufferedData,
+                                           maxLength: remainingLength,
+                                           userInfo: userInfo)
+      }
     } else {
       return BinaryDataDecodingContainer(bufferedData: bufferedData, maxLength: maxLength, userInfo: userInfo)
     }
