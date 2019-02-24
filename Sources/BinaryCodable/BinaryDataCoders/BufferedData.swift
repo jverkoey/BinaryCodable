@@ -32,7 +32,7 @@ public final class BufferedData {
   /**
    Whether the buffer's internal cursor has reached the end of the available content.
    */
-  public var isAtEnd: Bool { return reader.isAtEnd }
+  public var isAtEnd: Bool { return buffer.count == 0 && reader.isAtEnd }
 
   /**
    - parameter reader: An object that implements mechanisms for retrieving data that can be added to the buffer.
@@ -168,8 +168,8 @@ private final class DataBufferedDataSource: BufferedDataSource {
     guard !isAtEnd else {
       return nil
     }
-    let requestedData = data.prefix(length)
-    data = data.dropFirst(length)
+    let requestedData = data
+    data.removeAll()
     return requestedData
   }
 
