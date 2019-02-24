@@ -28,6 +28,7 @@ struct Field {
     case sint64
     case fixed32
     case fixed64
+    case bool
   }
   let type: FieldType
 }
@@ -103,7 +104,7 @@ private struct ProtoKeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContain
   }
 
   func decode(_ type: Bool.Type, forKey key: Key) throws -> Bool {
-    preconditionFailure("Unimplemented")
+    return try decodeFixedWidthInteger(UInt8.self, forKey: key) != 0
   }
 
   func decode(_ type: String.Type, forKey key: Key) throws -> String {
@@ -197,7 +198,8 @@ private struct ProtoKeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContain
     case (.int32, .varint(let rawValue)),
          (.int64, .varint(let rawValue)),
          (.uint32, .varint(let rawValue)),
-         (.uint64, .varint(let rawValue)): return T.init(clamping: rawValue)
+         (.uint64, .varint(let rawValue)),
+         (.bool, .varint(let rawValue)): return T.init(clamping: rawValue)
     case (.sint32, .varint(let rawValue)): return T.init(clamping: Int32(rawValue >> 1) ^ -Int32(rawValue & 1))
     case (.sint64, .varint(let rawValue)): return T.init(clamping: Int64(rawValue >> 1) ^ -Int64(rawValue & 1))
     case (.fixed32, .fixed32(let rawValue)): return T.init(clamping: rawValue)
