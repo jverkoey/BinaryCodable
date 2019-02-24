@@ -75,7 +75,7 @@ public final class BufferedData {
       buffer.append(data)
     }
     let data = buffer.prefix(maxBytes)
-    buffer = buffer[(buffer.startIndex + data.count)...]
+    buffer = buffer.dropFirst(data.count)
     return data
   }
 
@@ -100,12 +100,12 @@ public final class BufferedData {
     }
     if let indexOfDelimiter = indexOfDelimiter {
       let data = buffer.prefix(indexOfDelimiter - buffer.startIndex)
-      buffer = buffer[(buffer.startIndex + data.count + 1)...]
+      buffer = buffer.dropFirst(data.count + 1)
       return (data: data, didFindDelimiter: true)
     } else {
       // Couldn't find the delimeter, so read in all of the data.
       let data = buffer
-      buffer = buffer[(buffer.startIndex + data.count)...]
+      buffer = buffer.dropFirst(data.count)
       return (data: data, didFindDelimiter: false)
     }
   }
