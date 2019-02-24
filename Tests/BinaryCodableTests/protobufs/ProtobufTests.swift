@@ -397,14 +397,14 @@ class ProtobufTests: XCTestCase {
     }
   }
 
-  // MARK: double
+  // MARK: fixed32
 
-  func testDouble0Decoding() throws {
+  func testFixed320Decoding() throws {
     // Given
     do {
       let data = try compileProto(definition: """
         message value {
-          double value = 1;
+          fixed32 value = 1;
         }
         """, message: "value", content: """
         value: 0
@@ -421,19 +421,19 @@ class ProtobufTests: XCTestCase {
     }
   }
 
-  func testDoubleValueDecoding() throws {
+  func testFixed32ValueDecoding() throws {
     // Given
-    let valuesToTest: [Double] = [
-      -Double.greatestFiniteMagnitude, -3.14159, -1, 1, 3.14159, Double.greatestFiniteMagnitude,
+    let valuesToTest: [UInt32] = [
+      1, UInt32.max
     ]
 
     for value in valuesToTest {
       let data = try compileProto(definition: """
         message value {
-          double value = 1;
+          fixed32 value = 1;
         }
         """, message: "value", content: """
-        value: \(String(format: "%0.20f", value))
+        value: \(value)
         """)
       let decoder = BinaryDataDecoder()
 
@@ -447,9 +447,7 @@ class ProtobufTests: XCTestCase {
           continue
         }
         XCTAssertEqual(message.fieldNumber, 1)
-        // sint values will be zig-zag encoded.
-        // https://developers.google.com/protocol-buffers/docs/encoding#signed-integers
-        XCTAssertEqual(message.value, .fixed64(rawValue: value))
+        XCTAssertEqual(message.value, .fixed32(rawValue: value))
       } catch let error {
         XCTFail("Value \(value): \(String(describing: error))")
       }
@@ -506,9 +504,65 @@ class ProtobufTests: XCTestCase {
           continue
         }
         XCTAssertEqual(message.fieldNumber, 1)
-        // sint values will be zig-zag encoded.
-        // https://developers.google.com/protocol-buffers/docs/encoding#signed-integers
-        XCTAssertEqual(message.value, .fixed32(rawValue: value))
+
+        XCTAssertEqual(message.value, .fixed32(rawValue: value.bitPattern))
+      } catch let error {
+        XCTFail("Value \(value): \(String(describing: error))")
+      }
+    }
+  }
+
+  // MARK: double
+
+  func testDouble0Decoding() throws {
+    // Given
+    do {
+      let data = try compileProto(definition: """
+        message value {
+          double value = 1;
+        }
+        """, message: "value", content: """
+        value: 0
+        """)
+      let decoder = BinaryDataDecoder()
+
+      // When
+      let messages = try decoder.decode([ProtoMessage].self, from: data)
+
+      // Then
+      XCTAssertEqual(messages.count, 0)
+    } catch let error {
+      XCTFail(String(describing: error))
+    }
+  }
+
+  func testDoubleValueDecoding() throws {
+    // Given
+    let valuesToTest: [Double] = [
+      -Double.greatestFiniteMagnitude, -3.14159, -1, 1, 3.14159, Double.greatestFiniteMagnitude,
+    ]
+
+    for value in valuesToTest {
+      let data = try compileProto(definition: """
+        message value {
+          double value = 1;
+        }
+        """, message: "value", content: """
+        value: \(String(format: "%0.20f", value))
+        """)
+      let decoder = BinaryDataDecoder()
+
+      // When
+      do {
+        let messages = try decoder.decode([ProtoMessage].self, from: data)
+
+        // Then
+        XCTAssertEqual(messages.count, 1)
+        guard let message = messages.first else {
+          continue
+        }
+        XCTAssertEqual(message.fieldNumber, 1)
+        XCTAssertEqual(message.value, .fixed64(rawValue: value.bitPattern))
       } catch let error {
         XCTFail("Value \(value): \(String(describing: error))")
       }
@@ -526,12 +580,14 @@ class ProtobufTests: XCTestCase {
           uint32 second_value = 2;
           sint32 third_value = 3;
           float fourth_value = 4;
+          fixed32 fifth_value = 5;
         }
         """, message: "int_value", content: """
         third_value: 268435456
         first_value: 1
         second_value: \(UInt32.max)
         fourth_value: 1.5234
+        fifth_value: 123
         """)
       let decoder = ProtoDecoder()
 

@@ -22,6 +22,7 @@ struct Field {
     case uint32
     case sint32
     case float
+    case fixed32
   }
   let type: FieldType
 }
@@ -112,7 +113,7 @@ private struct ProtoKeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContain
     }
     switch (fieldDescriptor.type, message.value) {
     case (.float, .fixed32(let value)):
-      return value
+      return Float(bitPattern: value)
     default:
       preconditionFailure("Unimplemented")
     }
@@ -168,10 +169,10 @@ private struct ProtoKeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContain
                                                       debugDescription: "No value found for \(key) of type \(type)."))
     }
     switch (fieldDescriptor.type, message.value) {
-    case (.int32, .varint(let rawValue)), (.uint32, .varint(let rawValue)):
-      return T.init(clamping: rawValue)
-    case (.sint32, .varint(let rawValue)):
-      return T.init(clamping: Int32(rawValue >> 1) ^ -Int32(rawValue & 1))
+    case (.int32, .varint(let rawValue)),
+         (.uint32, .varint(let rawValue)): return T.init(clamping: rawValue)
+    case (.sint32, .varint(let rawValue)): return T.init(clamping: Int32(rawValue >> 1) ^ -Int32(rawValue & 1))
+    case (.fixed32, .fixed32(let rawValue)): return T.init(clamping: rawValue)
     default:
       preconditionFailure("Unimplemented")
     }

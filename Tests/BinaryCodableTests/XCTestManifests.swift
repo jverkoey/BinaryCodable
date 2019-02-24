@@ -66,6 +66,10 @@ extension LengthEncodedPacketEncoderTests {
 
 extension ProtobufTests {
     static let __allTests = [
+        ("testDouble0Decoding", testDouble0Decoding),
+        ("testDoubleValueDecoding", testDoubleValueDecoding),
+        ("testFixed320Decoding", testFixed320Decoding),
+        ("testFixed32ValueDecoding", testFixed32ValueDecoding),
         ("testFloat0Decoding", testFloat0Decoding),
         ("testFloatValueDecoding", testFloatValueDecoding),
         ("testGeneratedMessageDecoding", testGeneratedMessageDecoding),

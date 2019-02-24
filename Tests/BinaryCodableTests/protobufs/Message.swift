@@ -21,6 +21,7 @@ struct Message: ProtoDecodable {
   var value4: Float = 0
   var value2: UInt32 = 0
   var value3: Int32 = 0
+  var value5: UInt32 = 0
 
   static func fieldDescriptor(for key: CodingKey) -> Field? {
     guard let codingKey = key as? CodingKeys else {
@@ -31,6 +32,7 @@ struct Message: ProtoDecodable {
     case .value2: return Field(number: 2, type: .uint32)
     case .value3: return Field(number: 3, type: .sint32)
     case .value4: return Field(number: 4, type: .float)
+    case .value5: return Field(number: 5, type: .fixed32)
     }
   }
 }

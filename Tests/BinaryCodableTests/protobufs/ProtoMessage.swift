@@ -24,8 +24,8 @@ struct ProtoMessage: BinaryDecodable, Equatable {
   let fieldNumber: UInt8
   enum Value: Equatable {
     case varint(rawValue: UInt64)
-    case fixed32(rawValue: Float)
-    case fixed64(rawValue: Double)
+    case fixed32(rawValue: UInt32)
+    case fixed64(rawValue: UInt64)
   }
   let value: Value
 
@@ -47,8 +47,8 @@ struct ProtoMessage: BinaryDecodable, Equatable {
 
     switch wireType {
     case .varint: self.value = try .varint(rawValue: container.decode(VarInt.self).rawValue)
-    case .fixed32: self.value = try .fixed32(rawValue: container.decode(Float.self))
-    case .fixed64: self.value = try .fixed64(rawValue: container.decode(Double.self))
+    case .fixed32: self.value = try .fixed32(rawValue: container.decode(UInt32.self))
+    case .fixed64: self.value = try .fixed64(rawValue: container.decode(UInt64.self))
 
     default: throw BinaryDecodingError.dataCorrupted(.init(debugDescription: "Unimplemented wire type \(wireType)"))
     }
