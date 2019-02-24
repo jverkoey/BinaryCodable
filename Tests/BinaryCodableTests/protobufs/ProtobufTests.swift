@@ -588,6 +588,7 @@ class ProtobufTests: XCTestCase {
           fixed64 fixed64_value = 10;
           bool bool_value = 13;
           string string_value = 14;
+          bytes bytes_value = 15;
           int32 missing_value = 20;
         }
         """, message: "value", content: """
@@ -603,6 +604,7 @@ class ProtobufTests: XCTestCase {
         fixed64_value: \(UInt64.max)
         bool_value: true
         string_value: "Some string"
+        bytes_value: "\\000\\001\\002"
         """)
       let decoder = ProtoDecoder()
 
@@ -622,6 +624,10 @@ class ProtobufTests: XCTestCase {
       XCTAssertEqual(message.fixed64Value, UInt64.max)
       XCTAssertNotNil(message.boolValue)
       XCTAssertEqual(message.stringValue, "Some string")
+      XCTAssertNotNil(message.bytesValue)
+      if let bytesValue = message.bytesValue {
+        XCTAssertEqual([UInt8](bytesValue), [0, 1, 2])
+      }
       if let boolValue = message.boolValue {
         XCTAssertTrue(boolValue)
       }

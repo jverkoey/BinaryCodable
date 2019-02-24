@@ -30,6 +30,7 @@ struct Field {
     case fixed64
     case bool
     case string
+    case bytes
   }
   let type: FieldType
 }
@@ -228,7 +229,25 @@ private struct ProtoKeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContain
   }
 
   func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T : Decodable {
-    preconditionFailure("Unimplemented")
+    if type == Data.self {
+      // Data's default Decodable implementation requests an unkeyed container which is not a particularly helpful layer
+      // of indirection in our case. Rather than fall through to this logic, we handle Data decoding as an exception
+      // here.
+      guard let fieldDescriptor = decoder.fieldDescriptor(key) else {
+        throw DecodingError.keyNotFound(key, .init(codingPath: codingPath,
+                                                   debugDescription: "No field descriptor provided for \(key)."))
+      }
+      guard let message = decoder.mappedMessages[fieldDescriptor.number] else {
+        throw DecodingError.valueNotFound(T.self, .init(codingPath: codingPath,
+                                                        debugDescription: "No value found for \(key) of type \(type)."))
+      }
+      switch (fieldDescriptor.type, message.value) {
+      case (.bytes, .lengthDelimited(let data)): return data as! T
+      default:
+        preconditionFailure("Unimplemented")
+      }
+    }
+    return try T.init(from: decoder)
   }
 
   func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {

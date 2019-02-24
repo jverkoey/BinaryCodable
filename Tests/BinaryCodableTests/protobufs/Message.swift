@@ -28,6 +28,7 @@ struct Message: ProtoDecodable {
   var fixed64Value: UInt64?
   var boolValue: Bool?
   var stringValue: String?
+  var bytesValue: Data?
 
   var missingValue: Int32?
 
@@ -48,6 +49,7 @@ struct Message: ProtoDecodable {
     case .fixed64Value: return Field(number: 10, type: .fixed64)
     case .boolValue: return Field(number: 13, type: .bool)
     case .stringValue: return Field(number: 14, type: .string)
+    case .bytesValue: return Field(number: 15, type: .bytes)
     case .missingValue: return Field(number: 20, type: .int32)
     }
   }
