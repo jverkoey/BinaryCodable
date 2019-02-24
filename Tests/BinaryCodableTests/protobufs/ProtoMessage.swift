@@ -21,7 +21,7 @@ import Foundation
  Documentation: https://developers.google.com/protocol-buffers/docs/encoding
  */
 struct ProtoMessage: BinaryDecodable, Equatable {
-  let fieldNumber: UInt8
+  let fieldNumber: UInt64
   enum Value: Equatable {
     case varint(rawValue: UInt64)
     case lengthDelimited(data: Data)
@@ -30,7 +30,7 @@ struct ProtoMessage: BinaryDecodable, Equatable {
   }
   let value: Value
 
-  init(fieldNumber: UInt8, value: Value) {
+  init(fieldNumber: UInt64, value: Value) {
     self.fieldNumber = fieldNumber
     self.value = value
   }
@@ -38,21 +38,20 @@ struct ProtoMessage: BinaryDecodable, Equatable {
   init(from decoder: BinaryDecoder) throws {
     var container = decoder.container(maxLength: nil)
 
-    let key = try container.decode(UInt8.self)
+    let key = try container.decode(VarInt.self)
 
-    guard let wireType = ValueType(rawValue: key & 0b00000111) else {
-      throw BinaryDecodingError.dataCorrupted(.init(debugDescription: "Unknown value type \(key & 0b00000111)"))
+    let lowerBits = UInt8(key.rawValue & 0b00000111)
+    guard let wireType = ValueType(rawValue: lowerBits) else {
+      throw BinaryDecodingError.dataCorrupted(.init(debugDescription: "Unknown value type \(lowerBits)"))
     }
 
-    self.fieldNumber = key >> 3
+    self.fieldNumber = key.rawValue >> 3
 
     switch wireType {
     case .varint: self.value = try .varint(rawValue: container.decode(VarInt.self).rawValue)
     case .lengthDelimited: self.value = try .lengthDelimited(data: container.decode(LengthDelimited.self).data)
     case .fixed32: self.value = try .fixed32(rawValue: container.decode(UInt32.self))
     case .fixed64: self.value = try .fixed64(rawValue: container.decode(UInt64.self))
-
-    default: preconditionFailure("Unimplemented wire type \(wireType)")
     }
   }
 

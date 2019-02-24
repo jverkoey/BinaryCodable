@@ -15,6 +15,19 @@
 import BinaryCodable
 import Foundation
 
+struct Embedded: ProtoDecodable {
+  var int32Value: Int32?
+
+  static func fieldDescriptor(for key: CodingKey) -> Field? {
+    guard let codingKey = key as? CodingKeys else {
+      return nil
+    }
+    switch codingKey {
+    case .int32Value: return Field(number: 1, type: .int32)
+    }
+  }
+}
+
 struct Message: ProtoDecodable {
   var doubleValue: Double?
   var floatValue: Float?
@@ -29,6 +42,7 @@ struct Message: ProtoDecodable {
   var boolValue: Bool?
   var stringValue: String?
   var bytesValue: Data?
+  var embedded: Embedded?
 
   var missingValue: Int32?
 
@@ -50,6 +64,7 @@ struct Message: ProtoDecodable {
     case .boolValue: return Field(number: 13, type: .bool)
     case .stringValue: return Field(number: 14, type: .string)
     case .bytesValue: return Field(number: 15, type: .bytes)
+    case .embedded: return Field(number: 16, type: .embedded(Embedded.self))
     case .missingValue: return Field(number: 20, type: .int32)
     }
   }

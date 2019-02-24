@@ -575,6 +575,9 @@ class ProtobufTests: XCTestCase {
     // Given
     do {
       let data = try compileProto(definition: """
+        message embedded {
+          int32 int32_value = 1;
+        }
         message value {
           double double_value = 1;
           float float_value = 2;
@@ -589,6 +592,7 @@ class ProtobufTests: XCTestCase {
           bool bool_value = 13;
           string string_value = 14;
           bytes bytes_value = 15;
+          embedded embedded_value = 16;
           int32 missing_value = 20;
         }
         """, message: "value", content: """
@@ -605,6 +609,9 @@ class ProtobufTests: XCTestCase {
         bool_value: true
         string_value: "Some string"
         bytes_value: "\\000\\001\\002"
+        embedded_value {
+          int32_value: 5678
+        }
         """)
       let decoder = ProtoDecoder()
 
@@ -632,6 +639,7 @@ class ProtobufTests: XCTestCase {
         XCTAssertTrue(boolValue)
       }
       XCTAssertNil(message.missingValue)
+      XCTAssertEqual(message.embedded?.int32Value, 5678)
     } catch let error {
       XCTFail(String(describing: error))
     }

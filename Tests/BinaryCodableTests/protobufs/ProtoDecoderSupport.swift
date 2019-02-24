@@ -31,6 +31,7 @@ struct Field {
     case bool
     case string
     case bytes
+    case embedded(ProtoDecodable.Type)
   }
   let type: FieldType
 }
@@ -143,7 +144,7 @@ private struct ProtoKeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContain
     case (.double, .fixed64(let value)):
       return Double(bitPattern: value)
     default:
-      preconditionFailure("Unimplemented")
+      preconditionFailure("Unimplemented \(key) \(fieldDescriptor) \(message)")
     }
   }
 
@@ -247,7 +248,23 @@ private struct ProtoKeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContain
         preconditionFailure("Unimplemented")
       }
     }
-    return try T.init(from: decoder)
+
+    // Embedded types.
+    guard let fieldDescriptor = self.decoder.fieldDescriptor(key) else {
+      throw DecodingError.keyNotFound(key, .init(codingPath: codingPath,
+                                                 debugDescription: "No field descriptor provided for \(key)."))
+    }
+    guard let message = self.decoder.mappedMessages[fieldDescriptor.number] else {
+      throw DecodingError.valueNotFound(T.self, .init(codingPath: codingPath,
+                                                      debugDescription: "No value found for \(key) of type \(type)."))
+    }
+    switch (fieldDescriptor.type, message.value) {
+    case (.embedded(let embeddedType), .lengthDelimited(let data)):
+      let decoder = try _ProtoDecoder(data: data, fieldDescriptor: embeddedType.fieldDescriptor)
+      return try T.init(from: decoder)
+    default:
+      preconditionFailure("Unimplemented")
+    }
   }
 
   func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
