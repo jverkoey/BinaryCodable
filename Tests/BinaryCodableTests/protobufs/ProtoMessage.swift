@@ -24,6 +24,7 @@ struct ProtoMessage: BinaryDecodable, Equatable {
   let fieldNumber: UInt8
   enum Value: Equatable {
     case varint(rawValue: UInt64)
+    case lengthDelimited(data: Data)
     case fixed32(rawValue: UInt32)
     case fixed64(rawValue: UInt64)
   }
@@ -47,10 +48,11 @@ struct ProtoMessage: BinaryDecodable, Equatable {
 
     switch wireType {
     case .varint: self.value = try .varint(rawValue: container.decode(VarInt.self).rawValue)
+    case .lengthDelimited: self.value = try .lengthDelimited(data: container.decode(LengthDelimited.self).data)
     case .fixed32: self.value = try .fixed32(rawValue: container.decode(UInt32.self))
     case .fixed64: self.value = try .fixed64(rawValue: container.decode(UInt64.self))
 
-    default: throw BinaryDecodingError.dataCorrupted(.init(debugDescription: "Unimplemented wire type \(wireType)"))
+    default: preconditionFailure("Unimplemented wire type \(wireType)")
     }
   }
 
@@ -78,5 +80,15 @@ struct VarInt: BinaryDecodable {
       shiftAmount += 7
     } while (byte & msb) == msb
     self.rawValue = value
+  }
+}
+
+struct LengthDelimited: BinaryDecodable {
+  let data: Data
+  init(from decoder: BinaryDecoder) throws {
+    var container = decoder.container(maxLength: nil)
+
+    let length = try container.decode(VarInt.self)
+    self.data = try container.decode(length: Int(length.rawValue))
   }
 }

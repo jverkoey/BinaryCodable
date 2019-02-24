@@ -27,6 +27,8 @@ struct Message: ProtoDecodable {
   var fixed32Value: UInt32?
   var fixed64Value: UInt64?
   var boolValue: Bool?
+  var stringValue: String?
+
   var missingValue: Int32?
 
   static func fieldDescriptor(for key: CodingKey) -> Field? {
@@ -45,6 +47,7 @@ struct Message: ProtoDecodable {
     case .fixed32Value: return Field(number: 9, type: .fixed32)
     case .fixed64Value: return Field(number: 10, type: .fixed64)
     case .boolValue: return Field(number: 13, type: .bool)
+    case .stringValue: return Field(number: 14, type: .string)
     case .missingValue: return Field(number: 20, type: .int32)
     }
   }

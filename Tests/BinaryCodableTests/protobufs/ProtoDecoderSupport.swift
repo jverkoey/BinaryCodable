@@ -29,6 +29,7 @@ struct Field {
     case fixed32
     case fixed64
     case bool
+    case string
   }
   let type: FieldType
 }
@@ -108,7 +109,24 @@ private struct ProtoKeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContain
   }
 
   func decode(_ type: String.Type, forKey key: Key) throws -> String {
-    preconditionFailure("Unimplemented")
+    guard let fieldDescriptor = decoder.fieldDescriptor(key) else {
+      throw DecodingError.keyNotFound(key, .init(codingPath: codingPath,
+                                                 debugDescription: "No field descriptor provided for \(key)."))
+    }
+    guard let message = decoder.mappedMessages[fieldDescriptor.number] else {
+      throw DecodingError.valueNotFound(type, .init(codingPath: codingPath,
+                                                    debugDescription: "No value found for \(key) of type \(type)."))
+    }
+    switch (fieldDescriptor.type, message.value) {
+    case (.string, .lengthDelimited(let data)):
+      guard let string = String(data: data, encoding: .utf8) else {
+        throw DecodingError.dataCorruptedError(forKey: key, in: self,
+                                               debugDescription: "Unable to decode data as a utf8 string: \(data)")
+      }
+      return string
+    default:
+      preconditionFailure("Unimplemented")
+    }
   }
 
   func decode(_ type: Double.Type, forKey key: Key) throws -> Double {
