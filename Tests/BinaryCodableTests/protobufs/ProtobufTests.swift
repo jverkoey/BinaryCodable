@@ -579,15 +579,18 @@ class ProtobufTests: XCTestCase {
           double double_value = 1;
           float float_value = 2;
           int32 int32_value = 3;
+          int64 int64_value = 4;
           uint32 uint32_value = 5;
           sint32 sint32_value = 7;
           fixed32 fixed32_value = 9;
           fixed64 fixed64_value = 10;
+          int32 missing_value = 20;
         }
         """, message: "value", content: """
         double_value: 1.34159
         float_value: 1.5234
         int32_value: 1
+        int64_value: \(Int64.max)
         uint32_value: \(UInt32.max)
         sint32_value: 268435456
         fixed32_value: \(UInt32.max)
@@ -602,10 +605,12 @@ class ProtobufTests: XCTestCase {
       XCTAssertEqual(message.doubleValue, 1.34159)
       XCTAssertEqual(message.floatValue, 1.5234)
       XCTAssertEqual(message.int32Value, 1)
+      XCTAssertEqual(message.int64Value, Int64.max)
       XCTAssertEqual(message.uint32Value, UInt32.max)
       XCTAssertEqual(message.sint32Value, 268435456)
       XCTAssertEqual(message.fixed32Value, UInt32.max)
       XCTAssertEqual(message.fixed64Value, UInt64.max)
+      XCTAssertNil(message.missingValue)
     } catch let error {
       XCTFail(String(describing: error))
     }

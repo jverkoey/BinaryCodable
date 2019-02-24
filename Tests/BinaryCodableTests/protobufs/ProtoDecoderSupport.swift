@@ -21,6 +21,7 @@ struct Field {
     case float
     case double
     case int32
+    case int64
     case uint32
     case sint32
     case fixed32
@@ -85,11 +86,18 @@ private struct ProtoKeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContain
   }
 
   func contains(_ key: Key) -> Bool {
-    preconditionFailure("Unimplemented")
+    guard let fieldDescriptor = decoder.fieldDescriptor(key) else {
+      return false
+    }
+    return decoder.mappedMessages[fieldDescriptor.number] != nil
   }
 
   func decodeNil(forKey key: Key) throws -> Bool {
-    preconditionFailure("Unimplemented")
+    guard let fieldDescriptor = decoder.fieldDescriptor(key) else {
+      throw DecodingError.keyNotFound(key, .init(codingPath: codingPath,
+                                                 debugDescription: "No field descriptor provided for \(key)."))
+    }
+    return decoder.mappedMessages[fieldDescriptor.number] == nil
   }
 
   func decode(_ type: Bool.Type, forKey key: Key) throws -> Bool {
@@ -185,6 +193,7 @@ private struct ProtoKeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContain
     }
     switch (fieldDescriptor.type, message.value) {
     case (.int32, .varint(let rawValue)),
+         (.int64, .varint(let rawValue)),
          (.uint32, .varint(let rawValue)): return T.init(clamping: rawValue)
     case (.sint32, .varint(let rawValue)): return T.init(clamping: Int32(rawValue >> 1) ^ -Int32(rawValue & 1))
     case (.fixed32, .fixed32(let rawValue)): return T.init(clamping: rawValue)
