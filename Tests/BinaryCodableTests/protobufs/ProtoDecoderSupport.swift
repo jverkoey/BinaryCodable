@@ -23,6 +23,7 @@ struct Field {
     case sint32
     case float
     case fixed32
+    case fixed64
   }
   let type: FieldType
 }
@@ -173,6 +174,7 @@ private struct ProtoKeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContain
          (.uint32, .varint(let rawValue)): return T.init(clamping: rawValue)
     case (.sint32, .varint(let rawValue)): return T.init(clamping: Int32(rawValue >> 1) ^ -Int32(rawValue & 1))
     case (.fixed32, .fixed32(let rawValue)): return T.init(clamping: rawValue)
+    case (.fixed64, .fixed64(let rawValue)): return T.init(clamping: rawValue)
     default:
       preconditionFailure("Unimplemented")
     }

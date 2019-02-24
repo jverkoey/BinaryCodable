@@ -581,6 +581,7 @@ class ProtobufTests: XCTestCase {
           sint32 third_value = 3;
           float fourth_value = 4;
           fixed32 fifth_value = 5;
+          fixed64 sixth_value = 6;
         }
         """, message: "int_value", content: """
         third_value: 268435456
@@ -588,6 +589,7 @@ class ProtobufTests: XCTestCase {
         second_value: \(UInt32.max)
         fourth_value: 1.5234
         fifth_value: 123
+        sixth_value: \(UInt64.max)
         """)
       let decoder = ProtoDecoder()
 
@@ -598,6 +600,9 @@ class ProtobufTests: XCTestCase {
       XCTAssertEqual(message.value1, 1)
       XCTAssertEqual(message.value2, UInt32.max)
       XCTAssertEqual(message.value3, 268435456)
+      XCTAssertEqual(message.value4, 1.5234)
+      XCTAssertEqual(message.value5, 123)
+      XCTAssertEqual(message.value6, UInt64.max)
     } catch let error {
       XCTFail(String(describing: error))
     }
