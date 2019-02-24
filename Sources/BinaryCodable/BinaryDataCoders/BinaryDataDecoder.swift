@@ -109,7 +109,7 @@ private class BinaryDataDecodingContainer: BinaryDecodingContainer {
       throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
         "Not enough data to create a a type of \(type). Needed: \(byteWidth). Received: \(bytes.count)."))
     }
-    let value = Data(bytes).withUnsafeBytes { (ptr: UnsafePointer<T>) -> T in
+    let value = bytes.withUnsafeBytes { (ptr: UnsafePointer<T>) -> T in
       return ptr.pointee
     }
     return value
@@ -122,7 +122,7 @@ private class BinaryDataDecodingContainer: BinaryDecodingContainer {
       throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
         "Not enough data to create a a type of \(type). Needed: \(byteWidth). Received: \(bytes.count)."))
     }
-    let value = Data(bytes).withUnsafeBytes { (ptr: UnsafePointer<T>) -> T in
+    let value = bytes.withUnsafeBytes { (ptr: UnsafePointer<T>) -> T in
       return ptr.pointee
     }
     return value
