@@ -576,18 +576,20 @@ class ProtobufTests: XCTestCase {
     do {
       let data = try compileProto(definition: """
         message value {
-          int32 int32_value = 1;
-          uint32 uint32_value = 2;
-          sint32 sint32_value = 3;
-          float float_value = 4;
-          fixed32 fixed32_value = 5;
-          fixed64 fixed64_value = 6;
+          double double_value = 1;
+          float float_value = 2;
+          int32 int32_value = 3;
+          uint32 uint32_value = 5;
+          sint32 sint32_value = 7;
+          fixed32 fixed32_value = 9;
+          fixed64 fixed64_value = 10;
         }
         """, message: "value", content: """
+        double_value: 1.34159
+        float_value: 1.5234
         int32_value: 1
         uint32_value: \(UInt32.max)
         sint32_value: 268435456
-        float_value: 1.5234
         fixed32_value: \(UInt32.max)
         fixed64_value: \(UInt64.max)
         """)
@@ -597,10 +599,11 @@ class ProtobufTests: XCTestCase {
       let message = try decoder.decode(Message.self, from: data)
 
       // Then
+      XCTAssertEqual(message.doubleValue, 1.34159)
+      XCTAssertEqual(message.floatValue, 1.5234)
       XCTAssertEqual(message.int32Value, 1)
       XCTAssertEqual(message.uint32Value, UInt32.max)
       XCTAssertEqual(message.sint32Value, 268435456)
-      XCTAssertEqual(message.floatValue, 1.5234)
       XCTAssertEqual(message.fixed32Value, UInt32.max)
       XCTAssertEqual(message.fixed64Value, UInt64.max)
     } catch let error {

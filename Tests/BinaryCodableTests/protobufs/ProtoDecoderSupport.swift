@@ -18,10 +18,11 @@ import Foundation
 struct Field {
   let number: Int
   enum FieldType {
+    case float
+    case double
     case int32
     case uint32
     case sint32
-    case float
     case fixed32
     case fixed64
   }
@@ -100,7 +101,20 @@ private struct ProtoKeyedDecodingContainer<Key: CodingKey>: KeyedDecodingContain
   }
 
   func decode(_ type: Double.Type, forKey key: Key) throws -> Double {
-    preconditionFailure("Unimplemented")
+    guard let fieldDescriptor = decoder.fieldDescriptor(key) else {
+      throw DecodingError.keyNotFound(key, .init(codingPath: codingPath,
+                                                 debugDescription: "No field descriptor provided for \(key)."))
+    }
+    guard let message = decoder.mappedMessages[fieldDescriptor.number] else {
+      throw DecodingError.valueNotFound(type, .init(codingPath: codingPath,
+                                                    debugDescription: "No value found for \(key) of type \(type)."))
+    }
+    switch (fieldDescriptor.type, message.value) {
+    case (.double, .fixed64(let value)):
+      return Double(bitPattern: value)
+    default:
+      preconditionFailure("Unimplemented")
+    }
   }
 
   func decode(_ type: Float.Type, forKey key: Key) throws -> Float {

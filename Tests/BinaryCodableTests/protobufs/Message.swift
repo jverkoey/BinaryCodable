@@ -16,10 +16,11 @@ import BinaryCodable
 import Foundation
 
 struct Message: ProtoDecodable {
+  var doubleValue: Double = 0
+  var floatValue: Float = 0
   var int32Value: Int32 = 0
   var uint32Value: UInt32 = 0
   var sint32Value: Int32 = 0
-  var floatValue: Float = 0
   var fixed32Value: UInt32 = 0
   var fixed64Value: UInt64 = 0
 
@@ -28,12 +29,13 @@ struct Message: ProtoDecodable {
       return nil
     }
     switch codingKey {
-    case .int32Value: return Field(number: 1, type: .int32)
-    case .uint32Value: return Field(number: 2, type: .uint32)
-    case .sint32Value: return Field(number: 3, type: .sint32)
-    case .floatValue: return Field(number: 4, type: .float)
-    case .fixed32Value: return Field(number: 5, type: .fixed32)
-    case .fixed64Value: return Field(number: 6, type: .fixed64)
+    case .doubleValue: return Field(number: 1, type: .double)
+    case .floatValue: return Field(number: 2, type: .float)
+    case .int32Value: return Field(number: 3, type: .int32)
+    case .uint32Value: return Field(number: 5, type: .uint32)
+    case .sint32Value: return Field(number: 7, type: .sint32)
+    case .fixed32Value: return Field(number: 9, type: .fixed32)
+    case .fixed64Value: return Field(number: 10, type: .fixed64)
     }
   }
 }
