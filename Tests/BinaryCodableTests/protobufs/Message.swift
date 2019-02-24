@@ -16,25 +16,24 @@ import BinaryCodable
 import Foundation
 
 struct Message: ProtoDecodable {
-  // Intentionally shown here unordered.
-  var value1: Int32 = 0
-  var value4: Float = 0
-  var value2: UInt32 = 0
-  var value3: Int32 = 0
-  var value5: UInt32 = 0
-  var value6: UInt64 = 0
+  var int32Value: Int32 = 0
+  var uint32Value: UInt32 = 0
+  var sint32Value: Int32 = 0
+  var floatValue: Float = 0
+  var fixed32Value: UInt32 = 0
+  var fixed64Value: UInt64 = 0
 
   static func fieldDescriptor(for key: CodingKey) -> Field? {
     guard let codingKey = key as? CodingKeys else {
       return nil
     }
     switch codingKey {
-    case .value1: return Field(number: 1, type: .int32)
-    case .value2: return Field(number: 2, type: .uint32)
-    case .value3: return Field(number: 3, type: .sint32)
-    case .value4: return Field(number: 4, type: .float)
-    case .value5: return Field(number: 5, type: .fixed32)
-    case .value6: return Field(number: 6, type: .fixed64)
+    case .int32Value: return Field(number: 1, type: .int32)
+    case .uint32Value: return Field(number: 2, type: .uint32)
+    case .sint32Value: return Field(number: 3, type: .sint32)
+    case .floatValue: return Field(number: 4, type: .float)
+    case .fixed32Value: return Field(number: 5, type: .fixed32)
+    case .fixed64Value: return Field(number: 6, type: .fixed64)
     }
   }
 }

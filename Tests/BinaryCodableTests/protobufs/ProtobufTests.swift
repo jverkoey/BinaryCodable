@@ -575,21 +575,21 @@ class ProtobufTests: XCTestCase {
     // Given
     do {
       let data = try compileProto(definition: """
-        message int_value {
-          int32 first_value = 1;
-          uint32 second_value = 2;
-          sint32 third_value = 3;
-          float fourth_value = 4;
-          fixed32 fifth_value = 5;
-          fixed64 sixth_value = 6;
+        message value {
+          int32 int32_value = 1;
+          uint32 uint32_value = 2;
+          sint32 sint32_value = 3;
+          float float_value = 4;
+          fixed32 fixed32_value = 5;
+          fixed64 fixed64_value = 6;
         }
-        """, message: "int_value", content: """
-        third_value: 268435456
-        first_value: 1
-        second_value: \(UInt32.max)
-        fourth_value: 1.5234
-        fifth_value: 123
-        sixth_value: \(UInt64.max)
+        """, message: "value", content: """
+        int32_value: 1
+        uint32_value: \(UInt32.max)
+        sint32_value: 268435456
+        float_value: 1.5234
+        fixed32_value: \(UInt32.max)
+        fixed64_value: \(UInt64.max)
         """)
       let decoder = ProtoDecoder()
 
@@ -597,12 +597,12 @@ class ProtobufTests: XCTestCase {
       let message = try decoder.decode(Message.self, from: data)
 
       // Then
-      XCTAssertEqual(message.value1, 1)
-      XCTAssertEqual(message.value2, UInt32.max)
-      XCTAssertEqual(message.value3, 268435456)
-      XCTAssertEqual(message.value4, 1.5234)
-      XCTAssertEqual(message.value5, 123)
-      XCTAssertEqual(message.value6, UInt64.max)
+      XCTAssertEqual(message.int32Value, 1)
+      XCTAssertEqual(message.uint32Value, UInt32.max)
+      XCTAssertEqual(message.sint32Value, 268435456)
+      XCTAssertEqual(message.floatValue, 1.5234)
+      XCTAssertEqual(message.fixed32Value, UInt32.max)
+      XCTAssertEqual(message.fixed64Value, UInt64.max)
     } catch let error {
       XCTFail(String(describing: error))
     }
