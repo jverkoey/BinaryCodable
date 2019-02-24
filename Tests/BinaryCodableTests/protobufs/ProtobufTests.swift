@@ -583,6 +583,7 @@ class ProtobufTests: XCTestCase {
           uint32 uint32_value = 5;
           uint64 uint64_value = 6;
           sint32 sint32_value = 7;
+          sint32 sint64_value = 8;
           fixed32 fixed32_value = 9;
           fixed64 fixed64_value = 10;
           int32 missing_value = 20;
@@ -595,6 +596,7 @@ class ProtobufTests: XCTestCase {
         uint32_value: \(UInt32.max)
         uint64_value: \(UInt64.max)
         sint32_value: 268435456
+        sint64_value: 268435456
         fixed32_value: \(UInt32.max)
         fixed64_value: \(UInt64.max)
         """)
@@ -611,6 +613,7 @@ class ProtobufTests: XCTestCase {
       XCTAssertEqual(message.uint32Value, UInt32.max)
       XCTAssertEqual(message.uint64Value, UInt64.max)
       XCTAssertEqual(message.sint32Value, 268435456)
+      XCTAssertEqual(message.sint64Value, 268435456)
       XCTAssertEqual(message.fixed32Value, UInt32.max)
       XCTAssertEqual(message.fixed64Value, UInt64.max)
       XCTAssertNil(message.missingValue)
