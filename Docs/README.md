@@ -145,7 +145,7 @@ struct GIFHeader: BinaryDecodable {
 By using an enum we've accomplished two things:
 
 1. Clearly defined the expected values for this field.
-2. Added error handling for unexpected values: if a GIF format version other than 87a or 89a are encountered, a `BinaryDecodingError.dataCorrupted` exception will be thrown.
+2. Added error handling for unexpected values: if a GIF format version other than 87a or 89a is encountered, a `BinaryDecodingError.dataCorrupted` exception will be thrown.
 
 Note: we can also apply this pattern to `signature` using a single-value String enum. Try cleaning up your implementation accordingly!
 
