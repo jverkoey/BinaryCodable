@@ -22,8 +22,6 @@ struct GIFHeader {
 
 We'll implement decoding first because it's easier to test our code against an existing gif file.
 
-Aside: the biggest distinction between Swift Codable and Binary Codable is that we do not get encoding and decoding implementations for complex types for free. This is presently by design, though there are [opportunities for improving this in the future](https://github.com/jverkoey/BinaryCodable/issues/4). That being said, Binary Codable does provide automatic implementations for RawRepresentable types (namely enums with raw values).
-
 ```swift
 // New
 import BinaryCodable
@@ -40,6 +38,8 @@ let data = try Data(contentsOf: gifUrl)
 let decoder = BinaryDataDecoder()
 let header = try decoder.decode(GIFHeader.self, from: data)
 ```
+
+Aside: the biggest distinction between Swift Codable and Binary Codable is that we do not get encoding and decoding implementations for complex types for free. This is presently by design, though there are [opportunities for improving this in the future](https://github.com/jverkoey/BinaryCodable/issues/4). That being said, Binary Codable does provide automatic implementations for RawRepresentable types (namely enums with raw values).
 
 Like Swift Codable, we first create a sequential container.
 
