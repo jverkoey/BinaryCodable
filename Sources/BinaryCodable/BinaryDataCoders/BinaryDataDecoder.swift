@@ -70,7 +70,7 @@ private struct _BinaryDataDecoder: BinaryDecoder {
   }
 
   func container(maxLength: Int?) -> BinaryDecodingContainer {
-    if let container = container, let remainingLength = container.remainingLength {
+    if let remainingLength = container?.remainingLength {
       if let maxLength = maxLength {
         return BinaryDataDecodingContainer(bufferedData: bufferedData,
                                            maxLength: min(maxLength, remainingLength),
@@ -167,14 +167,19 @@ private class BinaryDataDecodingContainer: BinaryDecodingContainer {
 
   func nestedContainer(maxLength: Int?) -> BinaryDecodingContainer {
     let length: Int?
-    if let remainingLength = remainingLength, let maxLength = maxLength {
-      length = min(remainingLength, maxLength)
-    } else if let remainingLength = remainingLength {
-      length = remainingLength
+    let bufferedData: BufferedData
+    if let remainingLength = remainingLength {
+      if let maxLength = maxLength {
+        length = min(remainingLength, maxLength)
+      } else {
+        length = remainingLength
+      }
+      bufferedData = containedBuffer()
     } else {
       length = maxLength
+      bufferedData = self.bufferedData
     }
-    return BinaryDataDecodingContainer(bufferedData: containedBuffer(), maxLength: length, userInfo: userInfo)
+    return BinaryDataDecodingContainer(bufferedData: bufferedData, maxLength: length, userInfo: userInfo)
   }
 
   func pullData(length: Int) throws -> Data {
