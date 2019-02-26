@@ -1,5 +1,5 @@
 module: BinaryCodable
-module_version: 0.1.0
+module_version: 0.2.0
 sdk: iphonesimulator
 xcodebuild_arguments:
   - -project
