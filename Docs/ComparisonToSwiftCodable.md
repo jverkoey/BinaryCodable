@@ -14,11 +14,11 @@ Swift Codable and Binary Codable's related types are outlined below.
 | `Encodable`   | `BinaryEncodable` |
 | `Decodable`   | `BinaryDecodable` |
 
-| Swift Codable Encoder          | Binary Codable Encoder              |
-|:-------------------------------|:------------------------------------|
-| `KeyedEncodingContainer`       | No equivalent                       |
-| `UnkeyedEncodingContainer`     | `SequentialBinaryEncodingContainer` |
-| `SingleValueEncodingContainer` | No equivalent                       |
+| Swift Codable Encoder          | Binary Codable Encoder    |
+|:-------------------------------|:--------------------------|
+| `KeyedEncodingContainer`       | No equivalent             |
+| `UnkeyedEncodingContainer`     | `BinaryEncodingContainer` |
+| `SingleValueEncodingContainer` | No equivalent             |
 
 | Swift Codable Encoding Container | Binary Codable Encoding Container                                         |
 |:---------------------------------|:--------------------------------------------------------------------------|
@@ -34,11 +34,11 @@ Swift Codable and Binary Codable's related types are outlined below.
 | `encode(_ value: String)`        | `encode(_ value: String, encoding: String.Encoding, terminator: UInt8?)`  |
 | No equivalent                    | `encode<S>(sequence: S) throws where S: Sequence, S.Element == UInt8`     |
 
-| Swift Codable Decoder          | Binary Codable Decoder              |
-|:-------------------------------|:------------------------------------|
-| `KeyedDecodingContainer`       | No equivalent                       |
-| `UnkeyedDecodingContainer`     | `SequentialBinaryDecodingContainer` |
-| `SingleValueDecodingContainer` | No equivalent                       |
+| Swift Codable Decoder          | Binary Codable Decoder    |
+|:-------------------------------|:--------------------------|
+| `KeyedDecodingContainer`       | No equivalent             |
+| `UnkeyedDecodingContainer`     | `BinaryDecodingContainer` |
+| `SingleValueDecodingContainer` | No equivalent             |
 
 | Swift Codable Decoding Container                | Binary Codable Decoding Container                                       |
 |:------------------------------------------------|:------------------------------------------------------------------------|

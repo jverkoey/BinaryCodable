@@ -52,7 +52,7 @@ struct GIFHeader: BinaryDecodable {
   init(from decoder: BinaryDecoder) throws {
     // New
     // A nil maxLength means we don't know how long this container is.
-    var container = decoder.sequentialContainer(maxLength: nil)
+    var container = decoder.container(maxLength: nil)
   }
 }
 ```
@@ -82,7 +82,7 @@ import BinaryCodable
 struct GIFHeader: BinaryDecodable {
   init(from decoder: BinaryDecoder) throws {
     // Modified
-    var container = decoder.sequentialContainer(maxLength: 13)
+    var container = decoder.container(maxLength: 13)
   }
 }
 ```
@@ -279,7 +279,7 @@ struct GIFHeader: BinaryDecodable {
   let aspectRatio: UInt8
 
   init(from decoder: BinaryDecoder) throws {
-    var container = decoder.sequentialContainer(maxLength: 13)
+    var container = decoder.container(maxLength: 13)
 
     let signature = try container.decode(length: 3)
     if signature != Data("GIF".utf8) {
@@ -351,7 +351,7 @@ import BinaryCodable
 struct GIFHeader: BinaryCodable {
   func encode(to encoder: BinaryEncoder) throws {
     // New
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
   }
 }
 ```
@@ -363,7 +363,7 @@ import BinaryCodable
 
 struct GIFHeader: BinaryCodable {
   func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
 
     // New
     try container.encode("GIF", encoding: .ascii, terminator: nil)
@@ -383,7 +383,7 @@ struct GIFHeader: BinaryCodable {
     case gif89a = "89a"
   }
   func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
 
     try container.encode("GIF", encoding: .ascii, terminator: nil)
     // New
@@ -399,7 +399,7 @@ import BinaryCodable
 
 struct GIFHeader: BinaryCodable {
   func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
 
     try container.encode("GIF", encoding: .ascii, terminator: nil)
     try container.encode(version)
@@ -420,7 +420,7 @@ struct GIFHeader: BinaryCodable {
   struct Packed: OptionSet, BinaryCodable
 
   func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
 
     try container.encode("GIF", encoding: .ascii, terminator: nil)
     try container.encode(version)
@@ -449,7 +449,7 @@ import BinaryCodable
 
 struct GIFHeader: BinaryCodable {
   func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
 
     try container.encode("GIF", encoding: .ascii, terminator: nil)
     try container.encode(version)
