@@ -1,0 +1,10 @@
+module: BinaryCodable
+module_version: 0.1.0
+sdk: iphonesimulator
+xcodebuild_arguments:
+  - -project
+  - BinaryCodable.xcodeproj
+  - -scheme
+  - BinaryCodable-Package
+github_url: https://github.com/jverkoey/BinaryCodable
+github_file_prefix: https://github.com/jverkoey/BinaryCodable/tree/v2.0.0
