@@ -18,47 +18,47 @@ import XCTest
 private struct Packet: BinaryDecodable {
   let data: Data
   init(from decoder: BinaryDecoder) throws {
-    var container = decoder.sequentialContainer(maxLength: nil)
+    var container = decoder.container(maxLength: nil)
     let payloadLength = try container.decode(UInt32.self)
     self.data = try container.decode(length: Int(payloadLength))
   }
 }
 
-final class BinaryDataDecoderTests: XCTestCase {
+final class ArrayDecoderTests: XCTestCase {
 
   func testEmpty() throws {
     // Given
-    let packetData: [UInt8] = [0, 0, 0, 0]
+    let packetData: [UInt8] = [0, 0, 0, 0, 0, 0, 0, 0]
     let decoder = BinaryDataDecoder()
 
     // When
-    let packet = try decoder.decode(Packet.self, from: packetData)
+    let packets = try decoder.decode([Packet].self, from: packetData)
 
     // Then
-    XCTAssertEqual([UInt8](packet.data), [])
+    XCTAssertEqual(packets.map { [UInt8]($0.data) }, [[], []])
   }
 
   func testOneByte() throws {
     // Given
-    let packetData: [UInt8] = [1, 0, 0, 0, 127]
+    let packetData: [UInt8] = [1, 0, 0, 0, 127, 1, 0, 0, 0, 32]
     let decoder = BinaryDataDecoder()
 
     // When
-    let packet = try decoder.decode(Packet.self, from: packetData)
+    let packets = try decoder.decode([Packet].self, from: packetData)
 
     // Then
-    XCTAssertEqual([UInt8](packet.data), [127])
+    XCTAssertEqual(packets.map { [UInt8]($0.data) }, [[127], [32]])
   }
 
   func testMultipleByte() throws {
     // Given
-    let packetData: [UInt8] = [5, 0, 0, 0, 127, 32, 48, 12, 10]
+    let packetData: [UInt8] = [5, 0, 0, 0, 127, 32, 48, 12, 10, 4, 0, 0, 0, 10, 15, 0, 255]
     let decoder = BinaryDataDecoder()
 
     // When
-    let packet = try decoder.decode(Packet.self, from: packetData)
+    let packets = try decoder.decode([Packet].self, from: packetData)
 
     // Then
-    XCTAssertEqual([UInt8](packet.data), [127, 32, 48, 12, 10])
+    XCTAssertEqual(packets.map { [UInt8]($0.data) }, [[127, 32, 48, 12, 10], [10, 15, 0, 255]])
   }
 }

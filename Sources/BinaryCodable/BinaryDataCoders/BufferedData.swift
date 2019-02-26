@@ -32,7 +32,7 @@ public final class BufferedData {
   /**
    Whether the buffer's internal cursor has reached the end of the available content.
    */
-  public var isAtEnd: Bool = false
+  public var isAtEnd: Bool { return buffer.count == 0 && reader.isAtEnd }
 
   /**
    - parameter reader: An object that implements mechanisms for retrieving data that can be added to the buffer.
@@ -52,7 +52,6 @@ public final class BufferedData {
   public func peek(maxLength: Int) throws -> Data {
     while buffer.count < maxLength {
       guard let data = try reader.read(length: maxLength - buffer.count) else {
-        isAtEnd = true
         break
       }
       buffer.append(data)
@@ -71,13 +70,12 @@ public final class BufferedData {
   public func read(maxBytes: Int) throws -> Data {
     while buffer.count < maxBytes {
       guard let data = try reader.read(length: maxBytes - buffer.count) else {
-        isAtEnd = true
         break
       }
       buffer.append(data)
     }
     let data = buffer.prefix(maxBytes)
-    buffer = buffer[(buffer.startIndex + data.count)...]
+    buffer = buffer.dropFirst(data.count)
     return data
   }
 
@@ -93,7 +91,6 @@ public final class BufferedData {
     var indexOfDelimiter = buffer.firstIndex(of: delimiter)
     while indexOfDelimiter == nil {
       guard let data = try reader.read(length: 1) else {
-        isAtEnd = true
         break
       }
       if let subIndex = data.firstIndex(of: delimiter) {
@@ -103,12 +100,12 @@ public final class BufferedData {
     }
     if let indexOfDelimiter = indexOfDelimiter {
       let data = buffer.prefix(indexOfDelimiter - buffer.startIndex)
-      buffer = buffer[(buffer.startIndex + data.count + 1)...]
+      buffer = buffer.dropFirst(data.count + 1)
       return (data: data, didFindDelimiter: true)
     } else {
       // Couldn't find the delimeter, so read in all of the data.
       let data = buffer
-      buffer = buffer[(buffer.startIndex + data.count)...]
+      buffer = buffer.dropFirst(data.count)
       return (data: data, didFindDelimiter: false)
     }
   }
@@ -171,8 +168,8 @@ private final class DataBufferedDataSource: BufferedDataSource {
     guard !isAtEnd else {
       return nil
     }
-    let requestedData = data.prefix(length)
-    data = data.dropFirst(length)
+    let requestedData = data
+    data.removeAll()
     return requestedData
   }
 

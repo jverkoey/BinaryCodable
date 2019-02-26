@@ -10,7 +10,7 @@ import BinaryCodable
 struct <#DecodableObject#>: BinaryDecodable {
 
   init(from decoder: BinaryDecoder) throws {
-    var container = decoder.sequentialContainer(maxLength: <#maxLengthOrNil#>)
+    var container = decoder.container(maxLength: <#maxLengthOrNil#>)
 
     <#decoding logic#>
   }
@@ -31,7 +31,7 @@ import BinaryCodable
 struct <#EncodableObject#>: BinaryEncodable {
 
   func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
 
     <#encoding logic#>
   }
@@ -82,7 +82,7 @@ import BinaryCodable
 struct <#DecodableObject#>: BinaryDecodable {
 
   init(from decoder: BinaryDecoder) throws {
-    var container = decoder.sequentialContainer(maxLength: <#maxLengthOrNil#>)
+    var container = decoder.container(maxLength: <#maxLengthOrNil#>)
 
     let string = try container.decodeString(encoding: .utf8, terminator: 0)
   }
@@ -97,7 +97,7 @@ import BinaryCodable
 struct <#DecodableObject#>: BinaryDecodable {
 
   init(from decoder: BinaryDecoder) throws {
-    var container = decoder.sequentialContainer(maxLength: <#maxLengthOrNil#>)
+    var container = decoder.container(maxLength: <#maxLengthOrNil#>)
 
     var stringContainer = container.nestedContainer(maxLength: <#length#>)
     let string = try stringContainer.decodeString(encoding: .utf8, terminator: nil)
@@ -113,7 +113,7 @@ import BinaryCodable
 struct <#EncodableObject#>: BinaryEncodable {
 
   func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
 
     try container.encode("String", encoding: .utf8, terminator: 0)
   }
@@ -128,7 +128,7 @@ import BinaryCodable
 struct <#DecodableObject#>: BinaryDecodable {
 
   init(from decoder: BinaryDecoder) throws {
-    var container = decoder.sequentialContainer(maxLength: nil)
+    var container = decoder.container(maxLength: nil)
 
     let data = try container.decode(length: <#T##Int#>)
   }
@@ -143,7 +143,7 @@ import BinaryCodable
 struct <#EncodableObject#>: BinaryEncodable {
 
   func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
 
     try container.encode(sequence: <#T##Sequence#>)
   }

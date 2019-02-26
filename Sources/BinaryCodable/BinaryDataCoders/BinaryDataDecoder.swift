@@ -55,7 +55,7 @@ public struct BinaryDataDecoder {
 private struct _BinaryDataDecoder: BinaryDecoder {
   var bufferedData: BufferedData
   let userInfo: [BinaryCodingUserInfoKey: Any]
-  let container: SequentialBinaryDecodingContainer?
+  let container: BinaryDataDecodingContainer?
 
   init(bufferedData: BufferedData, userInfo: [BinaryCodingUserInfoKey: Any]) {
     self.bufferedData = bufferedData
@@ -63,21 +63,23 @@ private struct _BinaryDataDecoder: BinaryDecoder {
     self.container = nil
   }
 
-  init(bufferedData: BufferedData, userInfo: [BinaryCodingUserInfoKey: Any], container: SequentialBinaryDecodingContainer) {
+  init(bufferedData: BufferedData, userInfo: [BinaryCodingUserInfoKey: Any], container: BinaryDataDecodingContainer) {
     self.bufferedData = bufferedData
     self.userInfo = userInfo
     self.container = container
   }
 
-  func sequentialContainer(maxLength: Int?) -> SequentialBinaryDecodingContainer {
-    if let maxLength = maxLength, let container = container as? BinaryDataDecodingContainer, let remainingLength = container.remainingLength {
-      return BinaryDataDecodingContainer(bufferedData: bufferedData,
-                                         maxLength: min(maxLength, remainingLength),
-                                         userInfo: userInfo)
-    } else if let container = container as? BinaryDataDecodingContainer, let remainingLength = container.remainingLength {
-      return BinaryDataDecodingContainer(bufferedData: bufferedData,
-                                         maxLength: remainingLength,
-                                         userInfo: userInfo)
+  func container(maxLength: Int?) -> BinaryDecodingContainer {
+    if let remainingLength = container?.remainingLength {
+      if let maxLength = maxLength {
+        return BinaryDataDecodingContainer(bufferedData: bufferedData,
+                                           maxLength: min(maxLength, remainingLength),
+                                           userInfo: userInfo)
+      } else {
+        return BinaryDataDecodingContainer(bufferedData: bufferedData,
+                                           maxLength: remainingLength,
+                                           userInfo: userInfo)
+      }
     } else {
       return BinaryDataDecodingContainer(bufferedData: bufferedData, maxLength: maxLength, userInfo: userInfo)
     }
@@ -85,7 +87,7 @@ private struct _BinaryDataDecoder: BinaryDecoder {
 }
 
 // This needs to be a class instead of a struct because we hold a mutating reference in decode<T>.
-private class BinaryDataDecodingContainer: SequentialBinaryDecodingContainer {
+private class BinaryDataDecodingContainer: BinaryDecodingContainer {
   var bufferedData: BufferedData
   var remainingLength: Int?
   let userInfo: [BinaryCodingUserInfoKey: Any]
@@ -102,8 +104,30 @@ private class BinaryDataDecodingContainer: SequentialBinaryDecodingContainer {
     return bufferedData.isAtEnd
   }
 
-  func decode<IntegerType: FixedWidthInteger>(_ type: IntegerType.Type) throws -> IntegerType {
-    return try decodeFixedWidthInteger(type)
+  func decode<T: BinaryFloatingPoint>(_ type: T.Type) throws -> T {
+    let byteWidth = (type.significandBitCount + type.exponentBitCount + 1) / 8
+    let bytes = try pullData(length: byteWidth)
+    if bytes.count < byteWidth {
+      throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
+        "Not enough data to create a a type of \(type). Needed: \(byteWidth). Received: \(bytes.count)."))
+    }
+    let value = bytes.withUnsafeBytes { (ptr: UnsafePointer<T>) -> T in
+      return ptr.pointee
+    }
+    return value
+  }
+
+  func decode<T: FixedWidthInteger>(_ type: T.Type) throws -> T {
+    let byteWidth = type.bitWidth / 8
+    let bytes = try pullData(length: byteWidth)
+    if bytes.count < byteWidth {
+      throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
+        "Not enough data to create a a type of \(type). Needed: \(byteWidth). Received: \(bytes.count)."))
+    }
+    let value = bytes.withUnsafeBytes { (ptr: UnsafePointer<T>) -> T in
+      return ptr.pointee
+    }
+    return value
   }
 
   func decodeString(encoding: String.Encoding, terminator: UInt8?) throws -> String {
@@ -141,16 +165,21 @@ private class BinaryDataDecodingContainer: SequentialBinaryDecodingContainer {
     return data
   }
 
-  func nestedContainer(maxLength: Int?) -> SequentialBinaryDecodingContainer {
+  func nestedContainer(maxLength: Int?) -> BinaryDecodingContainer {
     let length: Int?
-    if let remainingLength = remainingLength, let maxLength = maxLength {
-      length = min(remainingLength, maxLength)
-    } else if let remainingLength = remainingLength {
-      length = remainingLength
+    let bufferedData: BufferedData
+    if let remainingLength = remainingLength {
+      if let maxLength = maxLength {
+        length = min(remainingLength, maxLength)
+      } else {
+        length = remainingLength
+      }
+      bufferedData = containedBuffer()
     } else {
       length = maxLength
+      bufferedData = self.bufferedData
     }
-    return BinaryDataDecodingContainer(bufferedData: containedBuffer(), maxLength: length, userInfo: userInfo)
+    return BinaryDataDecodingContainer(bufferedData: bufferedData, maxLength: length, userInfo: userInfo)
   }
 
   func pullData(length: Int) throws -> Data {
@@ -180,19 +209,6 @@ private class BinaryDataDecodingContainer: SequentialBinaryDecodingContainer {
         "Not enough bytes available to decode. Requested \(length), but received \(data.count)."))
     }
     return data
-  }
-
-  func decodeFixedWidthInteger<T>(_ type: T.Type) throws -> T where T: FixedWidthInteger {
-    let byteWidth = type.bitWidth / 8
-    let bytes = try pullData(length: byteWidth)
-    if bytes.count < byteWidth {
-      throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
-        "Not enough data to create a a type of \(type). Needed: \(byteWidth). Received: \(bytes.count)."))
-    }
-    let value = Data(bytes).withUnsafeBytes { (ptr: UnsafePointer<T>) -> T in
-      return ptr.pointee
-    }
-    return value
   }
 
   private func containedBuffer() -> BufferedData {

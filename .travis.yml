@@ -12,6 +12,9 @@ matrix:
       os: osx
       osx_image: xcode10.1
       language: swift
+      before_script:
+        - wget https://github.com/protocolbuffers/protobuf/releases/download/v3.6.1/protoc-3.6.1-osx-x86_64.zip
+        - unzip protoc-3.6.1-osx-x86_64.zip
       script:
         - swift test
 
@@ -20,6 +23,8 @@ matrix:
       dist: xenial
       language: c
       before_script:
+        - wget https://github.com/protocolbuffers/protobuf/releases/download/v3.6.1/protoc-3.6.1-linux-x86_64.zip
+        - unzip protoc-3.6.1-linux-x86_64.zip
         - wget https://swift.org/builds/swift-4.2.2-release/ubuntu1604/swift-4.2.2-RELEASE/swift-4.2.2-RELEASE-ubuntu16.04.tar.gz
         - tar xzf swift-4.2.2-RELEASE-ubuntu16.04.tar.gz
         - export PATH=$(pwd)/swift-4.2.2-RELEASE-ubuntu16.04/usr/bin:"${PATH}"
@@ -32,9 +37,11 @@ matrix:
       dist: xenial
       language: c
       before_script:
-        - wget "https://swift.org/builds/development/ubuntu1604/swift-DEVELOPMENT-SNAPSHOT-2019-02-14-a/swift-DEVELOPMENT-SNAPSHOT-2019-02-14-a-ubuntu16.04.tar.gz"
-        - tar xzf swift-DEVELOPMENT-SNAPSHOT-2019-02-14-a-ubuntu16.04.tar.gz
-        - export PATH=$(pwd)/swift-DEVELOPMENT-SNAPSHOT-2019-02-14-a-ubuntu16.04/usr/bin:"${PATH}"
+        - wget https://github.com/protocolbuffers/protobuf/releases/download/v3.6.1/protoc-3.6.1-linux-x86_64.zip
+        - unzip protoc-3.6.1-linux-x86_64.zip
+        - wget "https://swift.org/builds/development/ubuntu1604/swift-DEVELOPMENT-SNAPSHOT-2019-02-19-a/swift-DEVELOPMENT-SNAPSHOT-2019-02-19-a-ubuntu16.04.tar.gz"
+        - tar xzf swift-DEVELOPMENT-SNAPSHOT-2019-02-19-a-ubuntu16.04.tar.gz
+        - export PATH=$(pwd)/swift-DEVELOPMENT-SNAPSHOT-2019-02-19-a-ubuntu16.04/usr/bin:"${PATH}"
         - swift --version
       script:
         - swift test

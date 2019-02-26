@@ -46,7 +46,7 @@ public protocol BinaryDecoder {
    this container is able to read an infinite number of bytes.
    - returns: A container view into this decoder.
    */
-  func sequentialContainer(maxLength: Int?) -> SequentialBinaryDecodingContainer
+  func container(maxLength: Int?) -> BinaryDecodingContainer
 }
 
 /**
@@ -86,7 +86,7 @@ public enum BinaryDecodingError: Error {
  A type that provides a view into a decoder's storage and is used to hold the encoded properties of a decodable type
  sequentially.
  */
-public protocol SequentialBinaryDecodingContainer {
+public protocol BinaryDecodingContainer {
 
   /**
    A Boolean value indicating whether there are no more elements left to be decoded in the container.
@@ -109,7 +109,15 @@ public protocol SequentialBinaryDecodingContainer {
    - parameter type: The type of value to decode.
    - returns: A value of the requested type.
    */
-  mutating func decode<IntegerType: FixedWidthInteger>(_ type: IntegerType.Type) throws -> IntegerType
+  mutating func decode<T: FixedWidthInteger>(_ type: T.Type) throws -> T
+
+  /**
+   Decodes a value of the given type.
+
+   - parameter type: The type of value to decode.
+   - returns: A value of the requested type.
+   */
+  mutating func decode<T: BinaryFloatingPoint>(_ type: T.Type) throws -> T
 
   /**
    Decodes a value of the given type.
@@ -142,16 +150,14 @@ public protocol SequentialBinaryDecodingContainer {
    returned container is able to read all bytes that are readable by this container.
    - returns: A decoding container view into `self`.
    */
-  mutating func nestedContainer(maxLength: Int?) -> SequentialBinaryDecodingContainer
+  mutating func nestedContainer(maxLength: Int?) -> BinaryDecodingContainer
 }
 
 // MARK: RawRepresentable extensions
 
-// Primarily for enums with some FixedWidthInteger raw value
 extension RawRepresentable where RawValue: FixedWidthInteger, Self: BinaryDecodable {
   public init(from decoder: BinaryDecoder) throws {
-    let byteWidth = RawValue.bitWidth / 8
-    var container = decoder.sequentialContainer(maxLength: byteWidth)
+    var container = decoder.container(maxLength: nil)
     let decoded = try container.decode(RawValue.self)
     guard let value = Self(rawValue: decoded) else {
       throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
@@ -161,15 +167,38 @@ extension RawRepresentable where RawValue: FixedWidthInteger, Self: BinaryDecoda
   }
 }
 
-// Primarily for enums with a String raw value
+extension RawRepresentable where RawValue: BinaryFloatingPoint, Self: BinaryDecodable {
+  public init(from decoder: BinaryDecoder) throws {
+    var container = decoder.container(maxLength: nil)
+    let decoded = try container.decode(RawValue.self)
+    guard let value = Self(rawValue: decoded) else {
+      throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
+        "Cannot initialize \(Self.self) from invalid \(RawValue.self) value \(decoded)"))
+    }
+    self = value
+  }
+}
+
 extension RawRepresentable where RawValue == String, Self: BinaryDecodable {
   public init(from decoder: BinaryDecoder) throws {
-    var container = decoder.sequentialContainer(maxLength: nil)
+    var container = decoder.container(maxLength: nil)
     let decoded = try container.decodeString(encoding: .utf8, terminator: nil)
     guard let value = Self(rawValue: decoded) else {
       throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
         "Cannot initialize \(Self.self) from invalid \(RawValue.self) value \(decoded)"))
     }
     self = value
+  }
+}
+
+extension Array: BinaryDecodable where Element: BinaryDecodable {
+  public init(from decoder: BinaryDecoder) throws {
+    self.init()
+
+    var container = decoder.container(maxLength: nil)
+    while !container.isAtEnd {
+      let element = try container.decode(Element.self)
+      append(element)
+    }
   }
 }

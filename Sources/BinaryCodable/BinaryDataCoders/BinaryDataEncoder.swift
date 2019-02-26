@@ -40,18 +40,22 @@ private final class BinaryDataEncoderStorage {
 private struct _BinaryDataEncoder: BinaryEncoder {
   var storage = BinaryDataEncoderStorage()
 
-  func sequentialContainer() -> SequentialBinaryEncodingContainer {
+  func container() -> BinaryEncodingContainer {
     return BinaryDataEncodingContainer(encoder: self)
   }
 }
 
-private struct BinaryDataEncodingContainer: SequentialBinaryEncodingContainer {
+private struct BinaryDataEncodingContainer: BinaryEncodingContainer {
   let encoder: _BinaryDataEncoder
   init(encoder: _BinaryDataEncoder) {
     self.encoder = encoder
   }
 
-  func encode<IntegerType: FixedWidthInteger>(_ value: IntegerType) throws {
+  func encode<T: FixedWidthInteger>(_ value: T) throws {
+    encoder.storage.data.append(contentsOf: value.bytes)
+  }
+
+  func encode<T: BinaryFloatingPoint>(_ value: T) throws {
     encoder.storage.data.append(contentsOf: value.bytes)
   }
 

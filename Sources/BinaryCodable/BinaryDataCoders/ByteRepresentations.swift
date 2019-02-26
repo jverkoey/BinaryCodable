@@ -23,3 +23,14 @@ extension FixedWidthInteger {
     return stride(from: 0, to: bitWidth, by: 8).map { UInt8((self >> $0) & 0xFF) }
   }
 }
+
+extension BinaryFloatingPoint {
+  /**
+   Returns a byte array representation of a floating point number.
+   */
+  public var bytes: [UInt8] {
+    var value = self
+    let data = Data(buffer: UnsafeBufferPointer(start: &value, count: 1))
+    return [UInt8](data)
+  }
+}

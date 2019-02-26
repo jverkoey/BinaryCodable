@@ -38,7 +38,7 @@ public protocol BinaryEncoder {
 
    - returns: A new empty container.
    */
-  func sequentialContainer() -> SequentialBinaryEncodingContainer
+  func container() -> BinaryEncodingContainer
 }
 
 /**
@@ -78,7 +78,7 @@ public enum BinaryEncodingError: Error {
  A type that provides a view into an encoder's storage and is used to hold the encoded properties of a encodable type
  sequentially.
  */
-public protocol SequentialBinaryEncodingContainer {
+public protocol BinaryEncodingContainer {
 
   /**
    Encodes a String value using the given encoding and with a terminator at the end.
@@ -91,11 +91,18 @@ public protocol SequentialBinaryEncodingContainer {
   mutating func encode(_ value: String, encoding: String.Encoding, terminator: UInt8?) throws
 
   /**
-   Encodes a value of the given type.
+   Encodes a value of the given integer type.
 
    - parameter value: The value to encode.
    */
-  mutating func encode<IntegerType: FixedWidthInteger>(_ value: IntegerType) throws
+  mutating func encode<T: FixedWidthInteger>(_ value: T) throws
+
+  /**
+   Encodes a value of the given floating point type.
+
+   - parameter value: The value to encode.
+   */
+  mutating func encode<T: BinaryFloatingPoint>(_ value: T) throws
 
   /**
    Encodes a value of the given type.
@@ -116,14 +123,30 @@ public protocol SequentialBinaryEncodingContainer {
 
 extension RawRepresentable where RawValue: FixedWidthInteger, Self: BinaryEncodable {
   public func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
+    try container.encode(self.rawValue)
+  }
+}
+
+extension RawRepresentable where RawValue: BinaryFloatingPoint, Self: BinaryEncodable {
+  public func encode(to encoder: BinaryEncoder) throws {
+    var container = encoder.container()
     try container.encode(self.rawValue)
   }
 }
 
 extension RawRepresentable where RawValue == String, Self: BinaryEncodable {
   public func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
     try container.encode(self.rawValue, encoding: .utf8, terminator: nil)
+  }
+}
+
+extension Array: BinaryEncodable where Element: BinaryEncodable {
+  public func encode(to encoder: BinaryEncoder) throws {
+    var container = encoder.container()
+    for element in self {
+      try container.encode(element)
+    }
   }
 }

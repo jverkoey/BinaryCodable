@@ -22,8 +22,6 @@ struct GIFHeader {
 
 We'll implement decoding first because it's easier to test our code against an existing gif file.
 
-Aside: the biggest distinction between Swift Codable and Binary Codable is that we do not get encoding and decoding implementations for complex types for free. This is presently by design, though there are [opportunities for improving this in the future](https://github.com/jverkoey/BinaryCodable/issues/4). That being said, Binary Codable does provide automatic implementations for RawRepresentable types (namely enums with raw values).
-
 ```swift
 // New
 import BinaryCodable
@@ -41,6 +39,8 @@ let decoder = BinaryDataDecoder()
 let header = try decoder.decode(GIFHeader.self, from: data)
 ```
 
+Aside: the biggest distinction between Swift Codable and Binary Codable is that we do not get encoding and decoding implementations for complex types for free. This is presently by design, though there are [opportunities for improving this in the future](https://github.com/jverkoey/BinaryCodable/issues/4). That being said, Binary Codable does provide automatic implementations for RawRepresentable types (namely enums with raw values).
+
 Like Swift Codable, we first create a sequential container.
 
 Note: the container variable needs to be a `var` because we will mutate it.
@@ -52,7 +52,7 @@ struct GIFHeader: BinaryDecodable {
   init(from decoder: BinaryDecoder) throws {
     // New
     // A nil maxLength means we don't know how long this container is.
-    var container = decoder.sequentialContainer(maxLength: nil)
+    var container = decoder.container(maxLength: nil)
   }
 }
 ```
@@ -82,7 +82,7 @@ import BinaryCodable
 struct GIFHeader: BinaryDecodable {
   init(from decoder: BinaryDecoder) throws {
     // Modified
-    var container = decoder.sequentialContainer(maxLength: 13)
+    var container = decoder.container(maxLength: 13)
   }
 }
 ```
@@ -145,7 +145,7 @@ struct GIFHeader: BinaryDecodable {
 By using an enum we've accomplished two things:
 
 1. Clearly defined the expected values for this field.
-2. Added error handling for unexpected values: if a GIF format version other than 87a or 89a are encountered, a `BinaryDecodingError.dataCorrupted` exception will be thrown.
+2. Added error handling for unexpected values: if a GIF format version other than 87a or 89a is encountered, a `BinaryDecodingError.dataCorrupted` exception will be thrown.
 
 Note: we can also apply this pattern to `signature` using a single-value String enum. Try cleaning up your implementation accordingly!
 
@@ -279,7 +279,7 @@ struct GIFHeader: BinaryDecodable {
   let aspectRatio: UInt8
 
   init(from decoder: BinaryDecoder) throws {
-    var container = decoder.sequentialContainer(maxLength: 13)
+    var container = decoder.container(maxLength: 13)
 
     let signature = try container.decode(length: 3)
     if signature != Data("GIF".utf8) {
@@ -351,7 +351,7 @@ import BinaryCodable
 struct GIFHeader: BinaryCodable {
   func encode(to encoder: BinaryEncoder) throws {
     // New
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
   }
 }
 ```
@@ -363,7 +363,7 @@ import BinaryCodable
 
 struct GIFHeader: BinaryCodable {
   func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
 
     // New
     try container.encode("GIF", encoding: .ascii, terminator: nil)
@@ -383,7 +383,7 @@ struct GIFHeader: BinaryCodable {
     case gif89a = "89a"
   }
   func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
 
     try container.encode("GIF", encoding: .ascii, terminator: nil)
     // New
@@ -399,7 +399,7 @@ import BinaryCodable
 
 struct GIFHeader: BinaryCodable {
   func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
 
     try container.encode("GIF", encoding: .ascii, terminator: nil)
     try container.encode(version)
@@ -420,7 +420,7 @@ struct GIFHeader: BinaryCodable {
   struct Packed: OptionSet, BinaryCodable
 
   func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
 
     try container.encode("GIF", encoding: .ascii, terminator: nil)
     try container.encode(version)
@@ -449,7 +449,7 @@ import BinaryCodable
 
 struct GIFHeader: BinaryCodable {
   func encode(to encoder: BinaryEncoder) throws {
-    var container = encoder.sequentialContainer()
+    var container = encoder.container()
 
     try container.encode("GIF", encoding: .ascii, terminator: nil)
     try container.encode(version)

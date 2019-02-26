@@ -20,40 +20,43 @@ final class BufferedDataTests: XCTestCase {
   func testInitiallyPullsFromStart() throws {
     // Given
     let data = Data([UInt8](0..<255))
-    let lazyData = bufferedData(from: data)
+    let buffer = bufferedData(from: data)
 
     // When
-    let readData = try lazyData.read(maxBytes: 100)
+    let readData = try buffer.read(maxBytes: 100)
 
     // Then
     XCTAssertEqual([UInt8](readData), [UInt8](0..<100))
+    XCTAssertFalse(buffer.isAtEnd)
   }
 
   func testSuccessivePullsUseCursor() throws {
     // Given
     let data = Data([UInt8](0..<255))
-    let lazyData = bufferedData(from: data)
+    let buffer = bufferedData(from: data)
 
     // When
-    let readData1 = try lazyData.read(maxBytes: 25)
-    let readData2 = try lazyData.read(maxBytes: 25)
-    let readData3 = try lazyData.read(maxBytes: 25)
+    let readData1 = try buffer.read(maxBytes: 25)
+    let readData2 = try buffer.read(maxBytes: 25)
+    let readData3 = try buffer.read(maxBytes: 25)
 
     // Then
     XCTAssertEqual([UInt8](readData1), [UInt8](0..<25))
     XCTAssertEqual([UInt8](readData2), [UInt8](25..<50))
     XCTAssertEqual([UInt8](readData3), [UInt8](50..<75))
+    XCTAssertFalse(buffer.isAtEnd)
   }
 
   func testPullingMoreThanAvailableOnlyPullsWhatsAvailable() throws {
     // Given
     let data = Data([UInt8](0..<255))
-    let lazyData = bufferedData(from: data)
+    let buffer = bufferedData(from: data)
 
     // When
-    let readData = try lazyData.read(maxBytes: 1000)
+    let readData = try buffer.read(maxBytes: 1000)
 
     // Then
     XCTAssertEqual([UInt8](readData), [UInt8](0..<255))
+    XCTAssertTrue(buffer.isAtEnd)
   }
 }
