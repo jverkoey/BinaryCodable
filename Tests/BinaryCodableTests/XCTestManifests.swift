@@ -31,6 +31,13 @@ extension BufferedDataTests {
     ]
 }
 
+extension DecodeRemainderTests {
+    static let __allTests = [
+        ("testDecodesAllBytes", testDecodesAllBytes),
+        ("testDecodesAllContainerBytes", testDecodesAllContainerBytes),
+    ]
+}
+
 extension FixedWidthIntegerBytesTests {
     static let __allTests = [
         ("testIntDependsOnThePlatform", testIntDependsOnThePlatform),
@@ -96,6 +103,7 @@ public func __allTests() -> [XCTestCaseEntry] {
         testCase(ArrayEncoderTests.__allTests),
         testCase(BinaryFloatingPointBytesTests.__allTests),
         testCase(BufferedDataTests.__allTests),
+        testCase(DecodeRemainderTests.__allTests),
         testCase(FixedWidthIntegerBytesTests.__allTests),
         testCase(GIFDecoderTests.__allTests),
         testCase(LengthEncodedPacketDecoderTests.__allTests),

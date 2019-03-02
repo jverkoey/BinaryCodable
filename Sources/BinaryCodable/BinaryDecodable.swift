@@ -136,6 +136,13 @@ public protocol BinaryDecodingContainer {
   mutating func decode(length: Int) throws -> Data
 
   /**
+   Decodes the remainder of available data.
+
+   - returns: A Data representation of the decoded bytes.
+   */
+  mutating func decodeRemainder() throws -> Data
+
+  /**
    Reads `length` bytes without affecting the `decode` cursor.
 
    - parameter length: The number of bytes to peek ahead.

@@ -165,6 +165,10 @@ private class BinaryDataDecodingContainer: BinaryDecodingContainer {
     return data
   }
 
+  func decodeRemainder() throws -> Data {
+    return try pullData(length: Int.max)
+  }
+
   func nestedContainer(maxLength: Int?) -> BinaryDecodingContainer {
     let length: Int?
     let bufferedData: BufferedData
