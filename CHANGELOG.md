@@ -1,3 +1,8 @@
+# #develop#
+
+ TODO: Enumerate changes.
+
+
 # 0.2.0
 
 This minor unstable release renames `sequentialContainer` to `container` for both the BinaryEncoder and BinaryDecoder types, adds support for `BinaryFloatingPoint` decoding and encoding, automatic BinaryCodable conformance for floating point and array types, and a variety of performance improvements.
