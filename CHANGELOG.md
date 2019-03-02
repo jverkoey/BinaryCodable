@@ -1,7 +1,10 @@
-# #develop#
+# 0.2.1
 
- TODO: Enumerate changes.
+This patch releases updates the CocoaPods spec to include all BinaryCodable source. It was previously missing the coder implementations.
 
+## Non-source changes
+
+* [Include all source files in the podspec (#45)](https://github.com/jverkoey/BinaryCodable/commit/c315e31380eee7d1db6e0b36add1dce101d4f62e) (Wolfgang Profer)
 
 # 0.2.0
 
