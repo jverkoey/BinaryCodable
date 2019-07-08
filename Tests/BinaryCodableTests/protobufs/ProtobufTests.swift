@@ -662,7 +662,11 @@ class ProtobufTests: XCTestCase {
     try content.write(to: input, atomically: true, encoding: .utf8)
 
     let task = Process()
-    task.launchPath = environment.protocPath
+    if #available(OSX 10.13, *) {
+      task.executableURL = URL(fileURLWithPath: environment.protocPath)
+    } else {
+      task.launchPath = environment.protocPath
+    }
     task.standardInput = try FileHandle(forReadingFrom: input)
     task.standardOutput = try FileHandle(forWritingTo: output)
     task.standardError = try FileHandle(forWritingTo: errors)
@@ -673,7 +677,16 @@ class ProtobufTests: XCTestCase {
       proto.deletingLastPathComponent().absoluteString.replacingOccurrences(of: "file://", with: ""),
       proto.absoluteString.replacingOccurrences(of: "file://", with: "")
     ]
+    #if swift(>=5.0)
+    if #available(OSX 10.13, *) {
+      try task.run()
+    } else {
+      task.launch()
+    }
+    #else
     task.launch()
+    #endif
+
     task.waitUntilExit()
 
     let errorText = try String(contentsOf: errors)
@@ -692,7 +705,7 @@ private enum ProtoCompilerError: Error {
 private func temporaryFile() -> URL {
   let template = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("file.XXXXXX") as NSURL
   var buffer = [Int8](repeating: 0, count: Int(PATH_MAX))
-  template.getFileSystemRepresentation(&buffer, maxLength: buffer.count)
+  _ = template.getFileSystemRepresentation(&buffer, maxLength: buffer.count)
   let fd = mkstemp(&buffer)
   guard fd != -1 else {
     preconditionFailure("Unable to create temporary file.")
