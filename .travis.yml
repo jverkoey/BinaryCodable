@@ -8,9 +8,9 @@ branches:
 
 matrix:
   include:
-    - name: "OS X / Xcode 10.2"
+    - name: "OS X / Xcode 10.3"
       os: osx
-      osx_image: xcode10.2
+      osx_image: xcode10.3
       language: swift
       before_script:
         - wget https://github.com/protocolbuffers/protobuf/releases/download/v3.6.1/protoc-3.6.1-osx-x86_64.zip
@@ -18,9 +18,9 @@ matrix:
       script:
         - swift test
 
-    - name: "OS X / Xcode 11.0"
+    - name: "OS X / Xcode 11.3"
       os: osx
-      osx_image: xcode11
+      osx_image: xcode11.3
       language: swift
       before_script:
         - wget https://github.com/protocolbuffers/protobuf/releases/download/v3.6.1/protoc-3.6.1-osx-x86_64.zip
@@ -42,16 +42,16 @@ matrix:
       script:
         - swift test
 
-    - name: "Ubuntu 16.04 / Swift 5.0.2"
+    - name: "Ubuntu 16.04 / Swift 5.1.3"
       os: linux
       dist: xenial
       language: c
       before_script:
         - wget https://github.com/protocolbuffers/protobuf/releases/download/v3.6.1/protoc-3.6.1-linux-x86_64.zip
         - unzip protoc-3.6.1-linux-x86_64.zip
-        - wget https://swift.org/builds/swift-5.0.2-release/ubuntu1604/swift-5.0.2-RELEASE/swift-5.0.2-RELEASE-ubuntu16.04.tar.gz
-        - tar xzf swift-5.0.2-RELEASE-ubuntu16.04.tar.gz
-        - export PATH=$(pwd)/swift-5.0.2-RELEASE-ubuntu16.04/usr/bin:"${PATH}"
+        - wget https://swift.org/builds/swift-5.1.3-release/ubuntu1604/swift-5.1.3-RELEASE/swift-5.1.3-RELEASE-ubuntu16.04.tar.gz
+        - tar xzf swift-5.1.3-RELEASE-ubuntu16.04.tar.gz
+        - export PATH=$(pwd)/swift-5.1.3-RELEASE-ubuntu16.04/usr/bin:"${PATH}"
         - swift --version
       script:
         - swift test
@@ -63,9 +63,9 @@ matrix:
       before_script:
         - wget https://github.com/protocolbuffers/protobuf/releases/download/v3.6.1/protoc-3.6.1-linux-x86_64.zip
         - unzip protoc-3.6.1-linux-x86_64.zip
-        - wget "https://swift.org/builds/development/ubuntu1604/swift-DEVELOPMENT-SNAPSHOT-2019-07-15-a/swift-DEVELOPMENT-SNAPSHOT-2019-07-15-a-ubuntu16.04.tar.gz"
-        - tar xzf swift-DEVELOPMENT-SNAPSHOT-2019-07-15-a-ubuntu16.04.tar.gz
-        - export PATH=$(pwd)/swift-DEVELOPMENT-SNAPSHOT-2019-07-15-a-ubuntu16.04/usr/bin:"${PATH}"
+        - wget "https://swift.org/builds/development/ubuntu1604/swift-DEVELOPMENT-SNAPSHOT-2020-01-04-a/swift-DEVELOPMENT-SNAPSHOT-2020-01-04-a-ubuntu16.04.tar.gz"
+        - tar xzf swift-DEVELOPMENT-SNAPSHOT-2020-01-04-a-ubuntu16.04.tar.gz
+        - export PATH=$(pwd)/swift-DEVELOPMENT-SNAPSHOT-2020-01-04-a-ubuntu16.04/usr/bin:"${PATH}"
         - swift --version
       script:
         - swift test

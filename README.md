@@ -37,15 +37,13 @@ This is not an official Google product.
 - [BinaryCookies](https://github.com/interstateone/BinaryCookies): Read and write Apple's .binarycookies files.
 - [MySqlConnector](https://github.com/jverkoey/MySqlConnector): A pure Swift implementation of the MySql client/server protocol.
 
-## Requirements
-
-- Swift 4.2.2+
-
 ## Supported technologies
 
 - iOS 12.0+ / macOS 10.12+
 - Xcode 10.1+
 - Ubuntu 16.04
+- Swift 4.2.4
+- Swift 5.1.3
 
 ## License
 
