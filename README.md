@@ -39,11 +39,10 @@ This is not an official Google product.
 
 ## Supported technologies
 
-- iOS 12.0+ / macOS 10.12+
-- Xcode 10.1+
+- iOS 13.0+ / macOS 10.15+
+- Xcode 11.5+
 - Ubuntu 16.04
-- Swift 4.2.4
-- Swift 5.1.3
+- Swift 5.2
 
 ## License
 
