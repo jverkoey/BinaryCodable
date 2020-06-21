@@ -29,8 +29,6 @@ extension BinaryFloatingPoint {
    Returns a byte array representation of a floating point number.
    */
   public var bytes: [UInt8] {
-    var value = self
-    let data = Data(buffer: UnsafeBufferPointer(start: &value, count: 1))
-    return [UInt8](data)
+    return [UInt8](withUnsafeBytes(of: self) { Data($0) })
   }
 }

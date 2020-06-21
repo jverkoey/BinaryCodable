@@ -1,4 +1,4 @@
-// swift-tools-version:4.2
+// swift-tools-version:5.2
 // Copyright 2019-present the BinaryCodable authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +31,6 @@ let package = Package(
     .testTarget(
       name: "BinaryCodableTests",
       dependencies: ["BinaryCodable"]
-    ),
+    )
   ]
 )

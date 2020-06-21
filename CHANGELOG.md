@@ -1,3 +1,15 @@
+# 0.3.0
+
+This minor release adds a `decodeRemainder` method to `BinaryDecodingContainer` and drops support for iOS 12, macOS 10.12-10.14, and Swift 4.
+
+## Breaking changes
+
+iOS 12, macOS 10.12-10.14, and Swift 4 are no longer supported.
+
+## New features
+
+* [Add decodeRemainder to BinaryDecodingContainer. (#47)](https://github.com/jverkoey/BinaryCodable/commit/2d4834e4972c46bdb3ec59d025ba29b7e9b7522b) (featherless)
+
 # 0.2.1
 
 This patch releases updates the CocoaPods spec to include all BinaryCodable source. It was previously missing the coder implementations.
