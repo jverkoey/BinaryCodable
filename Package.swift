@@ -31,6 +31,6 @@ let package = Package(
     .testTarget(
       name: "BinaryCodableTests",
       dependencies: ["BinaryCodable"]
-    ),
+    )
   ]
 )

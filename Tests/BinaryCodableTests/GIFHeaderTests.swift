@@ -54,7 +54,17 @@ struct GIFHeader: BinaryCodable {
   let backgroundColorIndex: UInt8
   let aspectRatio: UInt8
 
-  init(version: Version, width: UInt16, height: UInt16, numberOfGlobalColorTableEntries: Int, colorTableEntriesSortedByImportance: Bool, colorResolution: UInt8, hasGlobalColorTable: Bool, backgroundColorIndex: UInt8, aspectRatio: UInt8) {
+  init(
+    version: Version,
+    width: UInt16,
+    height: UInt16,
+    numberOfGlobalColorTableEntries: Int,
+    colorTableEntriesSortedByImportance: Bool,
+    colorResolution: UInt8,
+    hasGlobalColorTable: Bool,
+    backgroundColorIndex: UInt8,
+    aspectRatio: UInt8
+  ) {
     self.version = version
     self.screenWidth = width
     self.screenHeight = height
@@ -145,7 +155,17 @@ final class GIFDecoderTests: XCTestCase {
 
   func testEncoding() throws {
     // Given
-    let header = GIFHeader(version: .gif89a, width: 46, height: 37, numberOfGlobalColorTableEntries: 4, colorTableEntriesSortedByImportance: false, colorResolution: 8, hasGlobalColorTable: true, backgroundColorIndex: 0, aspectRatio: 0)
+    let header = GIFHeader(
+      version: .gif89a,
+      width: 46,
+      height: 37,
+      numberOfGlobalColorTableEntries: 4,
+      colorTableEntriesSortedByImportance: false,
+      colorResolution: 8,
+      hasGlobalColorTable: true,
+      backgroundColorIndex: 0,
+      aspectRatio: 0
+    )
     let encoder = BinaryDataEncoder()
 
     // When
