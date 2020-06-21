@@ -12,9 +12,6 @@ matrix:
       os: osx
       osx_image: xcode11.6
       language: swift
-      before_script:
-        - wget https://github.com/protocolbuffers/protobuf/releases/download/v3.12.3/protoc-3.12.3-osx-x86_64.zip
-        - unzip protoc-3.12.3-osx-x86_64.zip
       script:
         - swift test
 
@@ -23,25 +20,21 @@ matrix:
       dist: xenial
       language: c
       before_script:
-        - wget https://github.com/protocolbuffers/protobuf/releases/download/v3.12.3/protoc-3.12.3-linux-x86_64.zip
-        - unzip protoc-3.12.3-linux-x86_64.zip
         - wget https://swift.org/builds/swift-5.2.4-release/ubuntu1604/swift-5.2.4-RELEASE/swift-5.2.4-RELEASE-ubuntu16.04.tar.gz
         - tar xzf swift-5.2.4-RELEASE-ubuntu16.04.tar.gz
         - export PATH=$(pwd)/swift-5.2.4-RELEASE-ubuntu16.04/usr/bin:"${PATH}"
         - swift --version
       script:
-        - swift test
+        - swift test --enable-test-discovery
 
     - name: "Ubuntu 16.04 / Swift latest"
       os: linux
       dist: xenial
       language: c
       before_script:
-        - wget https://github.com/protocolbuffers/protobuf/releases/download/v3.12.3/protoc-3.12.3-linux-x86_64.zip
-        - unzip protoc-3.12.3-linux-x86_64.zip
         - wget "https://swift.org/builds/development/ubuntu1604/swift-DEVELOPMENT-SNAPSHOT-2020-06-19-a/swift-DEVELOPMENT-SNAPSHOT-2020-06-19-a-ubuntu16.04.tar.gz"
         - tar xzf swift-DEVELOPMENT-SNAPSHOT-2020-06-19-a-ubuntu16.04.tar.gz
         - export PATH=$(pwd)/swift-DEVELOPMENT-SNAPSHOT-2020-06-19-a-ubuntu16.04/usr/bin:"${PATH}"
         - swift --version
       script:
-        - swift test
+        - swift test --enable-test-discovery
