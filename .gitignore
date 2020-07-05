@@ -3,3 +3,4 @@
 /Packages
 /*.xcodeproj
 bin/protoc
+.swiftpm/
