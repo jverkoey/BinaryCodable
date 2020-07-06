@@ -15,7 +15,7 @@
 import BinaryCodable
 import XCTest
 
-private struct MisalignedPacket: BinaryDecodable {
+private struct MisalignedUInt16Packet: BinaryDecodable {
   let twoByteInt: UInt16
   init(from decoder: BinaryDecoder) throws {
     var container = decoder.container(maxLength: nil)
@@ -24,17 +24,38 @@ private struct MisalignedPacket: BinaryDecodable {
   }
 }
 
+private struct MisalignedFloatPacket: BinaryDecodable {
+  let fourByteFloat: Float
+  init(from decoder: BinaryDecoder) throws {
+    var container = decoder.container(maxLength: nil)
+    _ = try container.decode(length: 1)
+    self.fourByteFloat = try container.decode(Float.self)
+  }
+}
+
 final class MisalignedDecoderTests: XCTestCase {
 
-  func testEmpty() throws {
+  func testUInt16() throws {
     // Given
     let packetData: [UInt8] = [0, 3, 0]
     let decoder = BinaryDataDecoder()
 
     // When
-    let packet = try decoder.decode(MisalignedPacket.self, from: packetData)
+    let packet = try decoder.decode(MisalignedUInt16Packet.self, from: packetData)
 
     // Then
     XCTAssertEqual(packet.twoByteInt, 3)
+  }
+
+  func testFloat() throws {
+    // Given
+    let packetData: [UInt8] = [0, 0, 0, 0x80, 0x3f]
+    let decoder = BinaryDataDecoder()
+
+    // When
+    let packet = try decoder.decode(MisalignedFloatPacket.self, from: packetData)
+
+    // Then
+    XCTAssertEqual(packet.fourByteFloat, 1.0, accuracy: 0.001)
   }
 }

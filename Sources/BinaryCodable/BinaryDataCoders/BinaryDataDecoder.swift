@@ -111,10 +111,13 @@ private class BinaryDataDecodingContainer: BinaryDecodingContainer {
       throw BinaryDecodingError.dataCorrupted(.init(debugDescription:
         "Not enough data to create a a type of \(type). Needed: \(byteWidth). Received: \(bytes.count)."))
     }
-    let value = bytes.withUnsafeBytes { ptr -> T in
-      return ptr.load(as: T.self)
+    return bytes.withUnsafeBytes { ptr in
+      var value: T = 0
+      withUnsafeMutableBytes(of: &value) { valuePtr in
+        valuePtr.copyMemory(from: UnsafeRawBufferPointer(rebasing: ptr[0..<ptr.count]))
+      }
+      return value
     }
-    return value
   }
 
   func decode<T: FixedWidthInteger>(_ type: T.Type) throws -> T {
