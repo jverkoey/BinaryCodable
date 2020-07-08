@@ -18,7 +18,6 @@ This is not an official Google product.
   - [Encode a null-terminated string](Docs/Usage.md#encode-a-null-terminated-string)
   - [Decode a sequence of bytes](Docs/Usage.md#decode-a-sequence-of-bytes)
   - [Encode a sequence of bytes](Docs/Usage.md#encode-a-sequence-of-bytes)
-- [Requirements](#requirements)
 - [Supported technologies](#supported-technologies)
 - [License](#license)
 
