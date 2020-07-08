@@ -1,3 +1,7 @@
+# 0.3.1
+
+This patch release fixes a crashing bug introduced in 0.3.0 that occurred when decoding two-byte values from misaligned memory.
+
 # 0.3.0
 
 This minor release adds a `decodeRemainder` method to `BinaryDecodingContainer` and drops support for iOS 12, macOS 10.12-10.14, and Swift 4.
